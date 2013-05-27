@@ -16,3 +16,7 @@
 /ASTMultiplicativeExpression.java
 /ASTStart.java
 /ASTUnaryExpression.java
+/JJTSIMPLState.java
+/SIMPLConstants.java
+/SIMPLTreeConstants.java
+/SIMPLVisitor.java
