@@ -8,3 +8,11 @@
 /SimpleNode.java
 /Token.java
 /TokenMgrError.java
+/EG2Visitor.java
+/ASTAdditiveExpression.java
+/ASTExpression.java
+/ASTIdentifier.java
+/ASTInteger.java
+/ASTMultiplicativeExpression.java
+/ASTStart.java
+/ASTUnaryExpression.java
