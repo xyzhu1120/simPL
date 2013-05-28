@@ -56,6 +56,8 @@ TOKEN : /* reserved words */
 | < AND : "and" >
 | < OR : "or" >
 | < NOT : "not" >
+| < TRUE : "true" >
+| < FALSE : "false" >
 }
 
 TOKEN : /*punctuation characters*/
@@ -73,6 +75,185 @@ TOKEN : /*punctuation characters*/
 | < BT : ">" >
 | < LT : "<" >
 | < TILDE : "~" >
+| < SEMICOLON : ";" >
+}
+TOKEN : /* LITERALS */{  < INTEGER_LITERAL :    < DECIMAL_LITERAL > ([ "l", "L" ])?  | < HEX_LITERAL > ([ "l", "L" ])?  | < OCTAL_LITERAL > ([ "l", "L" ])?     >| < #DECIMAL_LITERAL : [ "1"-"9" ] ([ "0"-"9" ])* >| < #HEX_LITERAL : "0" [ "x", "X" ] ([ "0"-"9", "a"-"f", "A"-"F" ])+ >| < #OCTAL_LITERAL : "0" ([ "0"-"7" ])* >}TOKEN : /* IDENTIFIERS */{  < IDENTIFIER :    < LETTER >    (      < LETTER >    | < DIGIT >    )* >| < #LETTER : [ "_", "a"-"z", "A"-"Z" ] >| < #DIGIT : [ "0"-"9" ] >}SimpleNode Start() :{}{  Expression() "$"  {    return jjtThis;  }}void Expression() :{}{  //AdditiveExpression()
+  SequenceExp()}
+
+void SequenceExp() :
+{}
+{  AssignExp()
+  (    LOOKAHEAD(2)< SEMICOLON > AssignExp()
+  )*
 }
 
-TOKEN : /* LITERALS */{  < INTEGER_LITERAL :    < DECIMAL_LITERAL > ([ "l", "L" ])?  | < HEX_LITERAL > ([ "l", "L" ])?  | < OCTAL_LITERAL > ([ "l", "L" ])?     >| < #DECIMAL_LITERAL : [ "1"-"9" ] ([ "0"-"9" ])* >| < #HEX_LITERAL : "0" [ "x", "X" ] ([ "0"-"9", "a"-"f", "A"-"F" ])+ >| < #OCTAL_LITERAL : "0" ([ "0"-"7" ])* >}TOKEN : /* IDENTIFIERS */{  < IDENTIFIER :    < LETTER >    (      < LETTER >    | < DIGIT >    )* >| < #LETTER : [ "_", "a"-"z", "A"-"Z" ] >| < #DIGIT : [ "0"-"9" ] >}SimpleNode Start() :{}{  Expression() ";"  {    return jjtThis;  }}void Expression() :{}{  AdditiveExpression()}void AdditiveExpression() :{}{  MultiplicativeExpression()  (    (      "+"    | "-"    )    MultiplicativeExpression()  )*}void MultiplicativeExpression() :{}{  UnaryExpression()  (    (      "*"    | "/"    | "%"    )    UnaryExpression()  )*}void UnaryExpression() :{}{  "(" Expression() ")"| Identifier()| Integer()}void Identifier() :{}{  < IDENTIFIER >}void Integer() :{}{  < INTEGER_LITERAL >}
+void AssignExp() :{}
+{
+  ListExp()
+  (    LOOKAHEAD(2)< ASSIGN >ListExp()
+  )*
+}
+
+void ListExp() :
+{}
+{  BinExp()
+  (    LOOKAHEAD(2)< LIST >BinExp()
+  )*
+}
+void BinExp() :
+{}
+{  AndOrExp()
+}
+
+void AndOrExp() :
+{}
+{  CompareExp()
+  (
+    LOOKAHEAD(2)(      < AND >
+  	| < OR >
+	)
+  CompareExp()  )*
+}
+
+void CompareExp() :
+{}
+{
+  AddMinusExp()  (    LOOKAHEAD(2)(      < LT >
+    | < BT >
+    | < EQUAL >
+  	)
+  	AddMinusExp()
+  )*
+}
+
+void AddMinusExp() :
+{}
+{
+  MulDivExp()
+  (    LOOKAHEAD(2)(      < PLUS >
+    | < MINUS >
+    )
+    MulDivExp()
+  )*
+}
+
+void MulDivExp() :
+{}
+{  NotExp()
+  ( 
+	  LOOKAHEAD(2)(
+	    < MULTI >
+	  | < DIVID >	  )
+	  NotExp()
+  )*
+}
+
+void NotExp() :
+{}
+{  PrimaryExp()
+}  
+
+void PrimaryExp() :{}
+{
+  LOOKAHEAD(2)PairExp()
+| LOOKAHEAD(2)ApplicationExp()
+| Variable()
+| unaryExp()
+| LetExp()
+| ConditionExp()
+| WhileExp()
+| FstExp()
+| SndExp()
+| HeadExp()
+| TailExp()
+| LOOKAHEAD(2)BracketExp()
+| Value()}
+
+void PairExp() :
+{}
+{
+  < LPAREN > Expression() < COMMA > Expression()< RPAREN >
+}
+
+void ApplicationExp() :
+{}
+{  < LPAREN > Expression() Expression() < RPAREN >
+}
+
+void unaryExp():
+{}{
+  < TILDE >
+| < NOT >
+Expression()
+}
+
+void LetExp() :
+{}
+{  < LET > Variable() < EQUAL > Expression() < IN > Expression() < END >
+}
+void ConditionExp() :
+{}
+{  < IF > Expression() < THEN > Expression() < ELSE > Expression()< END >
+}
+
+void WhileExp() :
+{}
+{  < WHILE >Expression()< DO >Expression()< END >
+}
+
+void FstExp() :{}
+{  < FST >Expression()
+}
+void SndExp() :
+{}
+{  < SND >Expression()
+}
+void HeadExp() :{}
+{  < HEAD >Expression()
+}
+
+void TailExp() :
+{}
+{  < TAIL >Expression()
+}
+
+void BracketExp() :
+{}
+{  < LPAREN >Expression()< RPAREN >
+}
+
+void Value() :
+{}
+{  ValueTerm()
+  (    LOOKAHEAD(2)< LIST > ValueTerm()
+  )*
+}
+
+void ValueTerm() :{}
+{  Integer()
+| Bool()
+| < NIL >
+| LOOKAHEAD(2)< LPAREN >< RPAREN >
+| Function()
+| < LPAREN >Value()< COMMA >Value()< RPAREN >
+}
+
+void ValueList() :
+{}
+{  Value()< LIST >Value()
+}
+void Function() :
+{}{  < FUN > Variable()< ANONYFUN > Expression()
+}
+
+void Variable() :
+{}
+{  < IDENTIFIER >
+}
+void AdditiveExpression() :{}{  MultiplicativeExpression()  (    (      "+"    | "-"    )    MultiplicativeExpression()  )*}void MultiplicativeExpression() :{}{  UnaryExpression()  (    (      "*"    | "/"    | "%"    )    UnaryExpression()  )*}void UnaryExpression() :{}{  "(" Expression() ")"| Identifier()| Integer()}void Identifier() :{}{  < IDENTIFIER >}void Integer() :{}{  < INTEGER_LITERAL >}
+
+void Bool() :
+{}
+{  < TRUE >
+| < FALSE >
+}
