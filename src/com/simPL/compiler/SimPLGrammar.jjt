@@ -82,23 +82,27 @@ TOKEN : /*punctuation characters*/
 
 void SequenceExp() #void:
 {}
-{  AssignExp()
-  (    LOOKAHEAD(2)< SEMICOLON > AssignExp()
-  )* 
+{  (    AssignExp()
+  (    < SEMICOLON > AssignExp()
+  )*
+  )#Exps(>1)
 } 
 
 void AssignExp() #void:{}
 {
-  ListExp()
-  (    LOOKAHEAD(2)< ASSIGN >ListExp()
+  (    ListExp()
+  (    < ASSIGN >ListExp()
   )*
+	)#Assignment(>1)
 }
 
 void ListExp() #void:
 {}
-{  BinExp()
-  (    LOOKAHEAD(2)< LIST >BinExp()
+{
+  (      BinExp()
+  (    < LIST >BinExp()
   )*
+	)#ListInsert(>1)
 }
 void BinExp() #void:
 {}
@@ -107,48 +111,51 @@ void BinExp() #void:
 
 void AndOrExp() #void:
 {}
-{  CompareExp()
+{  (    CompareExp()
   (
-    LOOKAHEAD(2)(      < AND >
+    (      < AND >
   	| < OR >
 	)
-  CompareExp()  )*
+  CompareExp()  )*)#AndOr(>1)
 }
 
 void CompareExp() #void:
 {}
 {
-  AddMinusExp()  (    LOOKAHEAD(2)(      < LT >
+  (    AddMinusExp()  (    (      < LT >
     | < BT >
     | < EQUAL >
   	)
   	AddMinusExp()
   )*
+	)#Compare(>1)
 }
 
 void AddMinusExp() #void:
 {}
 {
-  MulDivExp()
-  (    LOOKAHEAD(2)(      < PLUS >
+  (    MulDivExp()
+  (    (      < PLUS >
     | < MINUS >
     )
     MulDivExp()
-  )*
+  )* ) #AddMinus(>1)
 }
 
 void MulDivExp() #void:
 {}
-{  PrimaryExp()
-  ( 
-	  LOOKAHEAD(2)(
-	    < MULTI >
-	  | < DIVID >	  )
-	  PrimaryExp() 
-  )*
+{  (    PrimaryExp()
+	  ( 
+		  (
+		    (		      < MULTI >) 
+		  | (< DIVID >)		  )
+		  PrimaryExp() 
+	  )*
+	)#MulDiv(>1)
+	
 }
 
-void PrimaryExp() :{}
+void PrimaryExp() #void:{}
 {
 //  LOOKAHEAD(3)PairExp()
 //| LOOKAHEAD(3)ApplicationExp()
@@ -160,61 +167,65 @@ void PrimaryExp() :{}
 | BracketExp()
 | Value()}
 
-void PairExp() :
+void PairExp() #Pair:
 {}
 {
   Expression() < COMMA > Expression()
 }
 
-void ApplicationExp() :
+void ApplicationExp() #Application:
 {}
 {  Expression() Expression()
 }
 
 void UnaryExp():
 {}{
+  Unary()
+  PrimaryExp()
+}
+
+void Unary() #UnaryOP:{}{
   < TILDE >
 | < NOT >
 | < FST >
 | < SND >
 | < HEAD >
 | < TAIL >
-PrimaryExp()
-}
+}
 
-void LetExp() :
+void LetExp() #Let:
 {}
 {  < LET > Variable() < EQUAL > Expression() < IN > Expression() < END >
 }
-void ConditionExp() :
+void ConditionExp() #Cond:
 {}
 {  < IF > Expression() < THEN > Expression() < ELSE > Expression()< END >
 }
 
-void WhileExp() :
+void WhileExp() #While:
 {}
 {  < WHILE >Expression()< DO >Expression()< END >
 }
 
-void BracketExp() :
+void BracketExp() #Bracket:
 {}
 {  < LPAREN >
   Expression()
-  (    
+  (
     (< COMMA >)?
      Expression()
   )?
   < RPAREN >
 }
 
-void Value() :
+void Value() #void:
 {}
 {  ValueTerm()
 //  (//    LOOKAHEAD(2)< LIST > ValueTerm()
 //  )*
 }
 
-void ValueTerm() :{}
+void ValueTerm() #void:{}
 {  Integer()
 | Bool()
 | < NIL >
@@ -223,17 +234,17 @@ void ValueTerm() :{}
 //| < LPAREN >Value()< COMMA >Value()< RPAREN >
 }
 
-void Function() :
-{}{  < FUN > Variable()< ANONYFUN > Expression()
+void Function() #Function:
+{}{  < FUN > Variable()< ANONYFUN > Expression() < END >
 }
 
-void Variable() :
+void Variable() #Var:
 {}
 {  < IDENTIFIER >
 }
-void Integer() :{}{  < INTEGER_LITERAL >}
+void Integer() #Int:{}{  < INTEGER_LITERAL >}
 
-void Bool() :
+void Bool() #Bool:
 {}
 {  < TRUE >
 | < FALSE >
