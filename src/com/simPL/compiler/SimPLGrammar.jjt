@@ -77,35 +77,35 @@ TOKEN : /*punctuation characters*/
 | < TILDE : "~" >
 | < SEMICOLON : ";" >
 }
-TOKEN : /* LITERALS */{  < INTEGER_LITERAL :    < DECIMAL_LITERAL > ([ "l", "L" ])?  | < HEX_LITERAL > ([ "l", "L" ])?  | < OCTAL_LITERAL > ([ "l", "L" ])?     >| < #DECIMAL_LITERAL : [ "1"-"9" ] ([ "0"-"9" ])* >| < #HEX_LITERAL : "0" [ "x", "X" ] ([ "0"-"9", "a"-"f", "A"-"F" ])+ >| < #OCTAL_LITERAL : "0" ([ "0"-"7" ])* >}TOKEN : /* IDENTIFIERS */{  < IDENTIFIER :    < LETTER >    (      < LETTER >    | < DIGIT >    )* >| < #LETTER : [ "_", "a"-"z", "A"-"Z" ] >| < #DIGIT : [ "0"-"9" ] >}SimpleNode Start() :{}{  Expression() "$"  {    return jjtThis;  }}void Expression() :{}{  //AdditiveExpression()
+TOKEN : /* LITERALS */{  < INTEGER_LITERAL :    < DECIMAL_LITERAL > ([ "l", "L" ])?  | < HEX_LITERAL > ([ "l", "L" ])?  | < OCTAL_LITERAL > ([ "l", "L" ])?     >| < #DECIMAL_LITERAL : [ "1"-"9" ] ([ "0"-"9" ])* >| < #HEX_LITERAL : "0" [ "x", "X" ] ([ "0"-"9", "a"-"f", "A"-"F" ])+ >| < #OCTAL_LITERAL : "0" ([ "0"-"7" ])* >}TOKEN : /* IDENTIFIERS */{  < IDENTIFIER :    < LETTER >    (      < LETTER >    | < DIGIT >    )* >| < #LETTER : [ "_", "a"-"z", "A"-"Z" ] >| < #DIGIT : [ "0"-"9" ] >}SimpleNode Start() #START:{}{  Expression() "$"  {    return jjtThis;  }}void Expression() #void:{}{  //AdditiveExpression()
   SequenceExp()}
 
-void SequenceExp() :
+void SequenceExp() #void:
 {}
 {  AssignExp()
   (    LOOKAHEAD(2)< SEMICOLON > AssignExp()
-  )*
-}
+  )* 
+} 
 
-void AssignExp() :{}
+void AssignExp() #void:{}
 {
   ListExp()
   (    LOOKAHEAD(2)< ASSIGN >ListExp()
   )*
 }
 
-void ListExp() :
+void ListExp() #void:
 {}
 {  BinExp()
   (    LOOKAHEAD(2)< LIST >BinExp()
   )*
 }
-void BinExp() :
+void BinExp() #void:
 {}
 {  AndOrExp()
 }
 
-void AndOrExp() :
+void AndOrExp() #void:
 {}
 {  CompareExp()
   (
@@ -115,7 +115,7 @@ void AndOrExp() :
   CompareExp()  )*
 }
 
-void CompareExp() :
+void CompareExp() #void:
 {}
 {
   AddMinusExp()  (    LOOKAHEAD(2)(      < LT >
@@ -126,7 +126,7 @@ void CompareExp() :
   )*
 }
 
-void AddMinusExp() :
+void AddMinusExp() #void:
 {}
 {
   MulDivExp()
@@ -137,54 +137,49 @@ void AddMinusExp() :
   )*
 }
 
-void MulDivExp() :
+void MulDivExp() #void:
 {}
-{  NotExp()
+{  PrimaryExp()
   ( 
 	  LOOKAHEAD(2)(
 	    < MULTI >
 	  | < DIVID >	  )
-	  NotExp()
+	  PrimaryExp() 
   )*
 }
 
-void NotExp() :
-{}
-{  PrimaryExp()
-}  
-
 void PrimaryExp() :{}
 {
-  LOOKAHEAD(2)PairExp()
-| LOOKAHEAD(2)ApplicationExp()
-| Variable()
+//  LOOKAHEAD(3)PairExp()
+//| LOOKAHEAD(3)ApplicationExp()
+ Variable()
 | UnaryExp()
 | LetExp()
 | ConditionExp()
 | WhileExp()
-| FstExp()
-| SndExp()
-| HeadExp()
-| TailExp()
-| LOOKAHEAD(2)BracketExp()
+| BracketExp()
 | Value()}
 
 void PairExp() :
 {}
 {
-  < LPAREN > Expression() < COMMA > Expression()< RPAREN >
+  Expression() < COMMA > Expression()
 }
 
 void ApplicationExp() :
 {}
-{  < LPAREN > Expression() Expression() < RPAREN >
+{  Expression() Expression()
 }
 
 void UnaryExp():
 {}{
   < TILDE >
 | < NOT >
-Expression()
+| < FST >
+| < SND >
+| < HEAD >
+| < TAIL >
+PrimaryExp()
 }
 
 void LetExp() :
@@ -201,47 +196,33 @@ void WhileExp() :
 {  < WHILE >Expression()< DO >Expression()< END >
 }
 
-void FstExp() :{}
-{  < FST >Expression()
-}
-void SndExp() :
-{}
-{  < SND >Expression()
-}
-void HeadExp() :{}
-{  < HEAD >Expression()
-}
-
-void TailExp() :
-{}
-{  < TAIL >Expression()
-}
-
 void BracketExp() :
 {}
-{  < LPAREN >Expression()< RPAREN >
+{  < LPAREN >
+  Expression()
+  (    
+    (< COMMA >)?
+     Expression()
+  )?
+  < RPAREN >
 }
 
 void Value() :
 {}
 {  ValueTerm()
-  (    LOOKAHEAD(2)< LIST > ValueTerm()
-  )*
+//  (//    LOOKAHEAD(2)< LIST > ValueTerm()
+//  )*
 }
 
 void ValueTerm() :{}
 {  Integer()
 | Bool()
 | < NIL >
-| LOOKAHEAD(2)< LPAREN >< RPAREN >
+//| LOOKAHEAD(2)< LPAREN >< RPAREN >
 | Function()
-| < LPAREN >Value()< COMMA >Value()< RPAREN >
+//| < LPAREN >Value()< COMMA >Value()< RPAREN >
 }
 
-void ValueList() :
-{}
-{  Value()< LIST >Value()
-}
 void Function() :
 {}{  < FUN > Variable()< ANONYFUN > Expression()
 }
