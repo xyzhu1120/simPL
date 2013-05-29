@@ -64,13 +64,14 @@ public class SimPLEnv implements SIMPLTreeConstants, SIMPLConstants{
 	}
 	
 	public int GlobalSetSymbol(String name, SimPLSymbol newValue){
-		for(int i = 0; i < stack.size(); i++){
+		int i = 0;
+		for(; i < stack.size(); i++){
 			if(stack.get(stack.size()-1-i).containsKey(name)){
 				stack.get(stack.size()-1-i).put(name,newValue);
-				return 1;
+				return i;
 			}
 		}
-		return 0;
+		return -1;
 	}
 	
 	
