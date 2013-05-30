@@ -11,11 +11,11 @@ import com.simPL.compiler.ASTBool;
 import com.simPL.compiler.ASTBracket;
 import com.simPL.compiler.ASTCompare;
 import com.simPL.compiler.ASTCond;
-import com.simPL.compiler.ASTExps;
+import com.simPL.compiler.ASTExpression;
 import com.simPL.compiler.ASTFunction;
 import com.simPL.compiler.ASTInt;
 import com.simPL.compiler.ASTLet;
-import com.simPL.compiler.ASTListInsert;
+import com.simPL.compiler.ASTList;
 import com.simPL.compiler.ASTMulDiv;
 import com.simPL.compiler.ASTPair;
 import com.simPL.compiler.ASTSTART;
@@ -25,7 +25,7 @@ import com.simPL.compiler.ASTVar;
 import com.simPL.compiler.ASTWhile;
 import com.simPL.compiler.SIMPLVisitor;
 import com.simPL.compiler.SimpleNode;
-import com.simPL.compiler.SIMPLConstants;;
+import com.simPL.compiler.SIMPLConstants;
 
 /**
  *
@@ -55,33 +55,44 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.simPL.compiler.SIMPLVisitor#visit(com.simPL.compiler.ASTExps, java.lang.Object)
-	 */
-	@Override
-	public Object visit(ASTExps node, Object data) {
-		// TODO Auto-generated method stub
-		node.childrenAccept(this, data);
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see com.simPL.compiler.SIMPLVisitor#visit(com.simPL.compiler.ASTAssignment, java.lang.Object)
 	 */
 	@Override
 	public Object visit(ASTAssignment node, Object data) {
 		// TODO Auto-generated method stub
-		node.childrenAccept(this, data);
-		return null;
+		//node.childrenAccept(this, data);
+		int num = node.jjtGetNumChildren();
+		//System.out.println("in Assignment:"+num);
+		
+		Object first = node.jjtGetChild(0).jjtAccept(this, data);
+		for(int i = 1; i < num;i++){
+			node.jjtGetChild(i).jjtAccept(this, data);
+		}
+		if(num > 1){
+			SimPLSymbol result = new SimPLSymbol(ValueType.UNIT);
+			return result; 
+		}
+		return first;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.simPL.compiler.SIMPLVisitor#visit(com.simPL.compiler.ASTListInsert, java.lang.Object)
 	 */
 	@Override
-	public Object visit(ASTListInsert node, Object data) {
+	public Object visit(ASTList node, Object data) {
 		// TODO Auto-generated method stub
-		node.childrenAccept(this, data);
-		return null;
+		int num = node.jjtGetNumChildren();
+		//System.out.println("in List:"+num);
+		
+		Object first = node.jjtGetChild(0).jjtAccept(this, data);
+		for(int i = 1; i < num;i++){
+			node.jjtGetChild(i).jjtAccept(this, data);
+		}
+		if(num > 1){
+			SimPLSymbol result = new SimPLSymbol(ValueType.LIST);
+			return result; 
+		}
+		return first;
 	}
 
 	/* (non-Javadoc)
@@ -90,8 +101,18 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	@Override
 	public Object visit(ASTAndOr node, Object data) {
 		// TODO Auto-generated method stub
-		node.childrenAccept(this, data);
-		return null;
+		int num = node.jjtGetNumChildren();
+		//System.out.println("in AndOr:"+num);
+		
+		Object first = node.jjtGetChild(0).jjtAccept(this, data);
+		for(int i = 1; i < num;i++){
+			node.jjtGetChild(i).jjtAccept(this, data);
+		}
+		if(num > 1){
+			SimPLSymbol result = new SimPLSymbol(ValueType.BOOLEAN);
+			return result; 
+		}
+		return first;
 	}
 
 	/* (non-Javadoc)
@@ -100,8 +121,18 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	@Override
 	public Object visit(ASTCompare node, Object data) {
 		// TODO Auto-generated method stub
-		node.childrenAccept(this, data);
-		return null;
+		int num = node.jjtGetNumChildren();
+		//System.out.println("in Compare:"+num);
+		
+		Object first = node.jjtGetChild(0).jjtAccept(this, data);
+		for(int i = 1; i < num;i++){
+			node.jjtGetChild(i).jjtAccept(this, data);
+		}
+		if(num > 1){
+			SimPLSymbol result = new SimPLSymbol(ValueType.BOOLEAN);
+			return result; 
+		}
+		return first;
 	}
 
 	/* (non-Javadoc)
@@ -110,8 +141,18 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	@Override
 	public Object visit(ASTAddMinus node, Object data) {
 		// TODO Auto-generated method stub
-		node.childrenAccept(this, data);
-		return null;
+		int num = node.jjtGetNumChildren();
+		//System.out.println("in ADDMINUS:"+num);
+		
+		Object first = node.jjtGetChild(0).jjtAccept(this, data);
+		for(int i = 1; i < num;i++){
+			node.jjtGetChild(i).jjtAccept(this, data);
+		}
+		if(num > 1){
+			SimPLSymbol result = new SimPLSymbol(ValueType.INTEGER);
+			return result; 
+		}
+		return first;
 	}
 
 	/* (non-Javadoc)
@@ -120,29 +161,21 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	@Override
 	public Object visit(ASTMulDiv node, Object data) {
 		// TODO Auto-generated method stub
-		node.childrenAccept(this, data);
-		return null;
+		int num = node.jjtGetNumChildren();
+		//System.out.println("in MulDiv:"+num);
+		
+		Object first = node.jjtGetChild(0).jjtAccept(this, data);
+		for(int i = 1; i < num;i++){
+			node.jjtGetChild(i).jjtAccept(this, data);
+		}
+		if(num > 1){
+			SimPLSymbol result = new SimPLSymbol(ValueType.INTEGER);
+			return result; 
+		}
+		return first;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.simPL.compiler.SIMPLVisitor#visit(com.simPL.compiler.ASTPair, java.lang.Object)
-	 */
-	@Override
-	public Object visit(ASTPair node, Object data) {
-		// TODO Auto-generated method stub
-		node.childrenAccept(this, data);
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.simPL.compiler.SIMPLVisitor#visit(com.simPL.compiler.ASTApplication, java.lang.Object)
-	 */
-	@Override
-	public Object visit(ASTApplication node, Object data) {
-		// TODO Auto-generated method stub
-		node.childrenAccept(this, data);
-		return null;
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see com.simPL.compiler.SIMPLVisitor#visit(com.simPL.compiler.ASTUnaryExp, java.lang.Object)
@@ -155,26 +188,12 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.simPL.compiler.SIMPLVisitor#visit(com.simPL.compiler.ASTUnaryOP, java.lang.Object)
-	 */
-	@Override
-	public Object visit(ASTUnaryOP node, Object data) {
-		// TODO Auto-generated method stub
-		node.childrenAccept(this, data);
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see com.simPL.compiler.SIMPLVisitor#visit(com.simPL.compiler.ASTLet, java.lang.Object)
 	 */
 	@Override
 	public Object visit(ASTLet node, Object data) {
 		// TODO Auto-generated method stub
 		node.childrenAccept(this, data);
-		env.EnterBlock();
-		String firstchild =(String)node.jjtGetChild(0).jjtAccept(this, data);
-		int type = (int)node.jjtGetChild(2).jjtAccept(this, data);
-		env.LocalSetSymbol(firstchild, new SimPLSymbol(type));
 		return null;
 	}
 
@@ -204,8 +223,52 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	@Override
 	public Object visit(ASTBracket node, Object data) {
 		// TODO Auto-generated method stub
-		node.childrenAccept(this, data);
-		return null;
+		return node.jjtGetChild(0).jjtAccept(this, data);
+	}
+	/* (non-Javadoc)
+	 * @see com.simPL.compiler.SIMPLVisitor#visit(com.simPL.compiler.ASTPair, java.lang.Object)
+	 */
+	@Override
+	public Object visit(ASTPair node, Object data) {
+		// TODO Auto-generated method stub
+		int num = node.jjtGetNumChildren();
+		
+		Object first = node.jjtGetChild(0).jjtAccept(this, data);
+		Object second = node.jjtGetChild(1).jjtAccept(this, data);
+		SimPLSymbol result = new SimPLSymbol(ValueType.PAIR);
+		result.value = new MyPair(first,second);
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.simPL.compiler.SIMPLVisitor#visit(com.simPL.compiler.ASTApplication, java.lang.Object)
+	 */
+	@Override
+	public Object visit(ASTApplication node, Object data) {
+		// TODO Auto-generated method stub
+		int num = node.jjtGetNumChildren();
+		
+		//System.out.println("in Application:"+num);
+		Object func = node.jjtGetChild(0).jjtAccept(this, data);
+		for(int i = 1; i < num;i++){
+			node.jjtGetChild(i).jjtAccept(this, data);
+		}
+		if(func == null)
+			return null;
+		ASTFunction f=null;
+		if (func instanceof ASTFunction) {
+			//type new_name = (type) data;
+			//System.out.println("applicate func");
+			f = (ASTFunction) func;
+		}else {
+			SimPLSymbol s = (SimPLSymbol)func;
+			if(s.type == ValueType.VAR){
+				f = (ASTFunction)s.value;
+			}else
+				return null;
+		}
+		SimPLSymbol result = new SimPLSymbol(ValueType.UNIT);
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -215,7 +278,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	public Object visit(ASTFunction node, Object data) {
 		// TODO Auto-generated method stub
 		node.childrenAccept(this, data);
-		return null;
+		return node;
 	}
 
 	/* (non-Javadoc)
@@ -224,7 +287,10 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	@Override
 	public Object visit(ASTVar node, Object data) {
 		// TODO Auto-generated method stub
-		return node.jjtGetFirstToken().image;
+		node.childrenAccept(this, data);
+		SimPLSymbol result = new SimPLSymbol(ValueType.VAR);
+		result.value = node.jjtGetFirstToken().image;
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -234,7 +300,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	public Object visit(ASTInt node, Object data) {
 		// TODO Auto-generated method stub
 		node.childrenAccept(this, data);
-		SimPLSymbol result = new SimPLSymbol(ValueType.BOOLEAN);
+		SimPLSymbol result = new SimPLSymbol(ValueType.INTEGER);
 		result.value = node.jjtGetFirstToken().image;
 		return result;
 	}
@@ -247,14 +313,20 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		// TODO Auto-generated method stub
 		node.childrenAccept(this, data);
 		SimPLSymbol result = new SimPLSymbol(ValueType.BOOLEAN);
-		/*if (node.jjtGetFirstToken().image == "true")
-			result.value = true;
-		else if (node.jjtGetFirstToken().image == "false")
-			result.value = false;
-		else
-			result.value = null;*/
 		result.value = node.jjtGetFirstToken().image;
-		System.out.println("In Bool Node, return:"+result.value.toString());
+		//System.out.println("In Bool Node, return:"+result.value.toString());
+		return result;
+	}
+
+	@Override
+	public Object visit(ASTExpression node, Object data) {
+		// TODO Auto-generated method stub
+		//node.childrenAccept(this, data);
+		int num = node.jjtGetNumChildren();
+		Object result = null;
+		for(int i = 0; i < num;i++){
+			result = node.jjtGetChild(i).jjtAccept(this, data);
+		}
 		return result;
 	}
 

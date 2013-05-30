@@ -77,49 +77,43 @@ TOKEN : /*punctuation characters*/
 | < TILDE : "~" >
 | < SEMICOLON : ";" >
 }
-TOKEN : /* LITERALS */{  < INTEGER_LITERAL :    < DECIMAL_LITERAL > ([ "l", "L" ])?  | < HEX_LITERAL > ([ "l", "L" ])?  | < OCTAL_LITERAL > ([ "l", "L" ])?     >| < #DECIMAL_LITERAL : [ "1"-"9" ] ([ "0"-"9" ])* >| < #HEX_LITERAL : "0" [ "x", "X" ] ([ "0"-"9", "a"-"f", "A"-"F" ])+ >| < #OCTAL_LITERAL : "0" ([ "0"-"7" ])* >}TOKEN : /* IDENTIFIERS */{  < IDENTIFIER :    < LETTER >    (      < LETTER >    | < DIGIT >    )* >| < #LETTER : [ "_", "a"-"z", "A"-"Z" ] >| < #DIGIT : [ "0"-"9" ] >}SimpleNode Start() #START:{}{  Expression() "$"  {    return jjtThis;  }}void Expression() #void:{}{
-  SequenceExp()}
-
-void SequenceExp() #void:
+TOKEN : /* LITERALS */{  < INTEGER_LITERAL :    < DECIMAL_LITERAL > ([ "l", "L" ])?  | < HEX_LITERAL > ([ "l", "L" ])?  | < OCTAL_LITERAL > ([ "l", "L" ])?     >| < #DECIMAL_LITERAL : [ "1"-"9" ] ([ "0"-"9" ])* >| < #HEX_LITERAL : "0" [ "x", "X" ] ([ "0"-"9", "a"-"f", "A"-"F" ])+ >| < #OCTAL_LITERAL : "0" ([ "0"-"7" ])* >}TOKEN : /* IDENTIFIERS */{  < IDENTIFIER :    < LETTER >    (      < LETTER >    | < DIGIT >    )* >| < #LETTER : [ "_", "a"-"z", "A"-"Z" ] >| < #DIGIT : [ "0"-"9" ] >}SimpleNode Start() #START:{}{  Expression() "$"  {    return jjtThis;  }}
+void Expression() #Expression: 
 {}
 {  (    AssignExp()
   (    < SEMICOLON > AssignExp()
   )*
-  )#Exps(>1)
+  )
 } 
 
-void AssignExp() #void:{}
+void AssignExp() #Assignment:{}
 {
-  (    ListExp()
+      ListExp()
   (    < ASSIGN >ListExp()
-  )*
-	)#Assignment(>1)
+  )* 
 }
 
-void ListExp() #void:
+void ListExp() #List:
 {}
 {
-  (      BinExp()
-  (    < LIST >BinExp()
+  (      AndOrExp()
+  (    < LIST >AndOrExp()
   )*
-	)#ListInsert(>1)
+	)
 }
-void BinExp() #void:
-{}
-{  AndOrExp()
-}
 
-void AndOrExp() #void:
+ 
+void AndOrExp() #AndOr:
 {}
 {  (    CompareExp()
   (
     (      < AND >
   	| < OR >
 	)
-  CompareExp()  )*)#AndOr(>1)
+  CompareExp()  )*)
 }
 
-void CompareExp() #void:
+void CompareExp() #Compare:
 {}
 {
   (    AddMinusExp()  (    (      < LT >
@@ -128,10 +122,10 @@ void CompareExp() #void:
   	)
   	AddMinusExp()
   )*
-	)#Compare(>1)
+	)
 }
 
-void AddMinusExp() #void:
+void AddMinusExp() #AddMinus:
 {}
 {
   (    MulDivExp()
@@ -139,10 +133,10 @@ void AddMinusExp() #void:
     | < MINUS >
     )
     MulDivExp()
-  )* ) #AddMinus(>1)
+  )* )
 }
 
-void MulDivExp() #void:
+void MulDivExp() #MulDiv:
 {}
 {  (    PrimaryExp()
 	  ( 
@@ -151,7 +145,7 @@ void MulDivExp() #void:
 		  | (< DIVID >)		  )
 		  PrimaryExp() 
 	  )*
-	)#MulDiv(>1)
+	)
 	
 }
 
@@ -165,31 +159,17 @@ void PrimaryExp() #void:{}
 | BracketExp()
 | Value()}
 
-void PairExp() #Pair:
-{}
-{
-  Expression() < COMMA > Expression()
-}
-
-void ApplicationExp() #Application:
-{}
-{  Expression() Expression()
-}
-
 void UnaryExp():
 {}{
-  Unary()
-  PrimaryExp()
-}
-
-void Unary() #UnaryOP:{}{
   < TILDE >
 | < NOT >
 | < FST >
 | < SND >
 | < HEAD >
 | < TAIL >
-}
+  PrimaryExp()
+}
+
 
 void LetExp() #Let:
 {}
@@ -205,15 +185,19 @@ void WhileExp() #While:
 {  < WHILE >Expression()< DO >Expression()< END >
 }
 
-void BracketExp() #Bracket:
+void BracketExp() #void:
 {}
-{  < LPAREN >
-  Expression()
+{
+  LOOKAHEAD(< LPAREN >Expression()< COMMA >)
+  (    < LPAREN >Expression()< COMMA >Expression()< RPAREN >
+  )#Pair 
+|   LOOKAHEAD(< LPAREN >Expression()< RPAREN >)
   (
-    (< COMMA >)?
-     Expression()
-  )?
-  < RPAREN >
+    < LPAREN >Expression()< RPAREN >  )#Bracket
+|
+  (
+    < LPAREN >Expression()Expression()< RPAREN >
+  )#Application
 }
 
 void Value() #void:

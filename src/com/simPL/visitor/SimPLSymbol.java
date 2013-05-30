@@ -1,7 +1,7 @@
 package com.simPL.visitor;
 
 enum ValueType{
-	INTEGER,BOOLEAN,LIST,UNIT,PAIR
+	INTEGER,BOOLEAN,LIST,UNIT,PAIR,VAR
 }
 public class SimPLSymbol {
 	
