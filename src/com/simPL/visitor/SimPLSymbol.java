@@ -1,14 +1,17 @@
 package com.simPL.visitor;
 
+enum ValueType{
+	INTEGER,BOOLEAN,LIST,UNIT,PAIR
+}
 public class SimPLSymbol {
-
-	public int type;
+	
+	public ValueType type;
 	public Object value;
 	
-	SimPLSymbol(int theType){
+	SimPLSymbol(ValueType theType){
 		type = theType;
 	}
-	SimPLSymbol(int theType, Object theValue){
+	SimPLSymbol(ValueType theType, Object theValue){
 		type = theType;
 		value = theValue;
 	}

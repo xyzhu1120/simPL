@@ -2,6 +2,7 @@ package com.simPL;
 
 import com.simPL.compiler.SIMPL;
 import com.simPL.compiler.SimpleNode;
+import com.simPL.visitor.SIMPLVisitorImpl;
 
 public class SimPL {
 
@@ -16,6 +17,7 @@ public class SimPL {
 	    try
 	    {
 	      SimpleNode n = SIMPL.Start();
+	      n.jjtAccept(new SIMPLVisitorImpl(), null);
 	      n.dump("");
 	      System.out.println("Thank you.");
 	    }

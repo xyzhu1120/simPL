@@ -28,7 +28,6 @@ import com.simPL.compiler.SimpleNode;
 import com.simPL.compiler.SIMPLConstants;;
 
 /**
- * @author xyz
  *
  */
 public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
@@ -216,7 +215,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	public Object visit(ASTFunction node, Object data) {
 		// TODO Auto-generated method stub
 		node.childrenAccept(this, data);
-		return this.FUN;
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -235,7 +234,9 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	public Object visit(ASTInt node, Object data) {
 		// TODO Auto-generated method stub
 		node.childrenAccept(this, data);
-		return null;
+		SimPLSymbol result = new SimPLSymbol(ValueType.BOOLEAN);
+		result.value = node.jjtGetFirstToken().image;
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -245,7 +246,16 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	public Object visit(ASTBool node, Object data) {
 		// TODO Auto-generated method stub
 		node.childrenAccept(this, data);
-		return null;
+		SimPLSymbol result = new SimPLSymbol(ValueType.BOOLEAN);
+		/*if (node.jjtGetFirstToken().image == "true")
+			result.value = true;
+		else if (node.jjtGetFirstToken().image == "false")
+			result.value = false;
+		else
+			result.value = null;*/
+		result.value = node.jjtGetFirstToken().image;
+		System.out.println("In Bool Node, return:"+result.value.toString());
+		return result;
 	}
 
 }

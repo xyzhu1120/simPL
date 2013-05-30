@@ -98,18 +98,18 @@ public class SimPLEnv implements SIMPLTreeConstants, SIMPLConstants{
 		SimPLEnv env = new SimPLEnv();
 		env.EnterBlock();
 		if(!env.LocalExist("a"))
-			env.LocalSetSymbol("a", new SimPLSymbol(1));
+			env.LocalSetSymbol("a", new SimPLSymbol(ValueType.INTEGER));
 		if(!env.LocalExist("a"))
-			env.LocalSetSymbol("a", new SimPLSymbol(2));
+			env.LocalSetSymbol("a", new SimPLSymbol(ValueType.INTEGER));
 		if(!env.LocalExist("c"))
-			env.LocalSetSymbol("c", new SimPLSymbol(3));
+			env.LocalSetSymbol("c", new SimPLSymbol(ValueType.INTEGER));
 		if(!env.LocalExist("b"))
-			env.LocalSetSymbol("b", new SimPLSymbol(4));
+			env.LocalSetSymbol("b", new SimPLSymbol(ValueType.INTEGER));
 		env.EnterBlock();
 		if(!env.LocalExist("a"))
-			env.LocalSetSymbol("a", new SimPLSymbol(22));
+			env.LocalSetSymbol("a", new SimPLSymbol(ValueType.INTEGER));
 		if(!env.LocalExist("b"))
-			env.LocalSetSymbol("b", new SimPLSymbol(33));
+			env.LocalSetSymbol("b", new SimPLSymbol(ValueType.INTEGER));
 		env.PrintStack();
 	}
 
