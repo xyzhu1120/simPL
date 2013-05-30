@@ -50,8 +50,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	@Override
 	public Object visit(ASTSTART node, Object data) {
 		// TODO Auto-generated method stub
-		node.childrenAccept(this, data);
-		return null;
+		//return node.childrenAccept(this, data);
+		return node.jjtGetChild(0).jjtAccept(this, data);
 	}
 
 	/* (non-Javadoc)
@@ -145,12 +145,38 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		//System.out.println("in ADDMINUS:"+num);
 		
 		Object first = node.jjtGetChild(0).jjtAccept(this, data);
-		for(int i = 1; i < num;i++){
-			node.jjtGetChild(i).jjtAccept(this, data);
+		try {
+			if(num > 1){
+				int sum = 0;
+				Object cur = first;
+				int sign = 1;
+				for(int i = 0; i < num; i++){
+					SimPLSymbol curS = (SimPLSymbol)cur;
+					if(curS.type == ValueType.INTEGER)
+						sum += sign * Integer.parseInt((String)curS.value);
+					else if(curS.type == ValueType.VAR)
+					{
+						//sum += (int)cur.value;
+					}else if(curS.type == ValueType.EXCEPTION){
+						return curS;
+					}
+					if( i == num -1 )
+						break;
+					SimpleNode last = (SimpleNode)(node.jjtGetChild(i));
+					System.out.println(last.jjtGetLastToken().next.image);
+					if(last.jjtGetLastToken().next.image == "+")
+						sign = 1;
+					else
+						sign = -1;
+					cur = node.jjtGetChild(i+1).jjtAccept(this, data);
+				}
+				SimPLSymbol result = new SimPLSymbol(ValueType.INTEGER);
+				result.value = Integer.toString(sum);
+				return result; 
+			}
 		}
-		if(num > 1){
-			SimPLSymbol result = new SimPLSymbol(ValueType.INTEGER);
-			return result; 
+		catch (Exception e){
+			return new SimPLSymbol(ValueType.EXCEPTION,"Err in AddMinus");
 		}
 		return first;
 	}
@@ -249,23 +275,21 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		int num = node.jjtGetNumChildren();
 		
 		//System.out.println("in Application:"+num);
-		Object func = node.jjtGetChild(0).jjtAccept(this, data);
+		SimPLSymbol func = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
 		for(int i = 1; i < num;i++){
 			node.jjtGetChild(i).jjtAccept(this, data);
 		}
-		if(func == null)
-			return null;
+		if(func.type == ValueType.EXCEPTION)
+			return func;
 		ASTFunction f=null;
-		if (func instanceof ASTFunction) {
-			//type new_name = (type) data;
-			//System.out.println("applicate func");
-			f = (ASTFunction) func;
+		if (func.type == ValueType.FUN) {
+			f = (ASTFunction) func.value;
 		}else {
-			SimPLSymbol s = (SimPLSymbol)func;
-			if(s.type == ValueType.VAR){
-				f = (ASTFunction)s.value;
+			if(func.type == ValueType.VAR){
+				//f = (ASTFunction)func.value;
+				//look for the symbol table
 			}else
-				return null;
+				return new SimPLSymbol(ValueType.EXCEPTION,"Wrong in fun first argument");
 		}
 		SimPLSymbol result = new SimPLSymbol(ValueType.UNIT);
 		return result;
@@ -277,8 +301,9 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	@Override
 	public Object visit(ASTFunction node, Object data) {
 		// TODO Auto-generated method stub
-		node.childrenAccept(this, data);
-		return node;
+		//node.childrenAccept(this, data);
+		SimPLSymbol result = new SimPLSymbol(ValueType.FUN,node);
+		return result;
 	}
 
 	/* (non-Javadoc)

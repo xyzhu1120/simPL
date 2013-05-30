@@ -1,8 +1,7 @@
-package com.simPL;
+package com.simPL.visitor;
 
 import com.simPL.compiler.SIMPL;
 import com.simPL.compiler.SimpleNode;
-import com.simPL.visitor.SIMPLVisitorImpl;
 
 public class SimPL {
 
@@ -17,9 +16,11 @@ public class SimPL {
 	    try
 	    {
 	      SimpleNode n = SIMPL.Start();
-	      n.jjtAccept(new SIMPLVisitorImpl(), null);
-	      n.dump("");
-	      System.out.println("Thank you.");
+	      Object result = n.jjtAccept(new SIMPLVisitorImpl(), null);
+	      SimPLSymbol r = (SimPLSymbol)result;
+	      if(r.type == ValueType.INTEGER)
+	    	 System.out.println((String)r.value);
+	      //n.dump("");
 	    }
 	    catch (Exception e)
 	    {
