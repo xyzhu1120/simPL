@@ -9,9 +9,13 @@ public class SimPLSymbol {
 	public Object value;
 	
 	SimPLSymbol(ValueType theType){
+		if(theType == ValueType.EXCEPTION)
+			System.err.println("exception happens");
 		type = theType;
 	}
 	SimPLSymbol(ValueType theType, Object theValue){
+		if(theType == ValueType.EXCEPTION)
+			System.err.println((String)theValue);
 		type = theType;
 		value = theValue;
 	}

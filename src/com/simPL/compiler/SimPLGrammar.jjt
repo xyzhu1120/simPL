@@ -87,10 +87,9 @@ void Expression() #Expression:
 } 
 
 void AssignExp() #Assignment:{}
-{
-      ListExp()
+{    ListExp()
   (    < ASSIGN >ListExp()
-  )* 
+  )?
 }
 
 void ListExp() #List:
@@ -208,10 +207,12 @@ void Value() #void:
 void ValueTerm() #void:{}
 {  Integer()
 | Bool()
-| < NIL >
+| Nil() 
 | Function()
 }
-
+void Nil() #Nil:
+{}{
+  < NIL >}
 void Function() #Function:
 {}{  < FUN > Variable()< ANONYFUN > Expression() < END >
 }
