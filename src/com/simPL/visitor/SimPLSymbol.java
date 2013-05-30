@@ -19,6 +19,7 @@ public class SimPLSymbol {
 		type = theType;
 		value = theValue;
 	}
+	
 	/**
 	 * @param args
 	 */

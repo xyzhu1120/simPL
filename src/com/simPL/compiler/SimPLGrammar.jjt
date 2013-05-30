@@ -87,7 +87,12 @@ void Expression() #Expression:
 } 
 
 void AssignExp() #Assignment:{}
-{    ListExp()
+{
+  (    < FST >
+| < SND >
+| < HEAD >
+| < TAIL >
+)*    ListExp()
   (    < ASSIGN >ListExp()
   )?
 }
@@ -101,7 +106,7 @@ void ListExp() #List:
 	)
 }
 
- 
+  
 void AndOrExp() #AndOr:
 {}
 {  (    CompareExp()
@@ -162,10 +167,10 @@ void UnaryExp():
 {}{
   < TILDE >
 | < NOT >
-| < FST >
-| < SND >
-| < HEAD >
-| < TAIL >
+//| < FST >
+//| < SND >
+//| < HEAD >
+//| < TAIL >
   PrimaryExp()
 }
 

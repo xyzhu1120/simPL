@@ -19,3 +19,11 @@ in
 	end
 end
 $
+let a = 1 in 
+	let b = 1 in
+		b:= a;
+		a:=2;
+		b:=b+1;
+		b+1
+	end
+end$

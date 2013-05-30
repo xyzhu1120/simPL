@@ -23,11 +23,9 @@ class SimpleNode implements Node {
   }
 
   public void jjtOpen() {
-	  firstToken = parser.getToken(1);
   }
 
   public void jjtClose() {
-	  lastToken = parser.getToken(0);
   }
 
   public void jjtSetParent(Node n) { parent = n; }

@@ -27,6 +27,7 @@ import com.simPL.compiler.SIMPL;
 import com.simPL.compiler.SIMPLVisitor;
 import com.simPL.compiler.SimpleNode;
 import com.simPL.compiler.SIMPLConstants;
+import com.simPL.compiler.Token;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,13 +67,14 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		//node.childrenAccept(this, data);
 		int num = node.jjtGetNumChildren();
 		//System.out.println("in Assignment:"+num);
-		
 		SimPLSymbol left = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
 		if(num > 1){
 			SimPLSymbol right = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
 			if(left.type == ValueType.VAR){
 				if(env.GlobalExist((String)left.value)){
 					SimPLSymbol ori = env.GlobalGetSymbol((String)left.value);
+					if(right.type==ValueType.VAR)
+						right = env.GlobalGetSymbol(right.value.toString());
 					if(ori.type == right.type)
 					{
 						env.GlobalSetSymbol((String)left.value, right);
@@ -86,9 +88,57 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				return new SimPLSymbol(ValueType.EXCEPTION,"not a left var in assignment");
 			}
 			SimPLSymbol result = new SimPLSymbol(ValueType.UNIT);
-			return result; 
+			if(node.jjtGetFirstToken().image == "head" || node.jjtGetFirstToken().image == "tail" || node.jjtGetFirstToken().image == "fst" || node.jjtGetFirstToken().image == "snd"){
+				return new SimPLSymbol(ValueType.EXCEPTION,"cannot operate on a unit");
+			}
+			return result;
 		}
-		return left;
+		
+		SimPLSymbol n = left;
+		Token cur = node.jjtGetFirstToken();
+		while(cur != ((SimpleNode)node.jjtGetChild(0)).jjtGetFirstToken()){
+			try{
+				if(cur.image == "head"){
+					if(n.type != ValueType.LIST){
+						return new SimPLSymbol(ValueType.EXCEPTION,"head argument is not a list");
+					}else{
+						if(n.value == null)//empty list
+							return new SimPLSymbol(ValueType.EXCEPTION,"head on nil");
+						else {
+							n = ((ArrayList<SimPLSymbol>)(n.value)).get(0);
+							cur = cur.next;
+							continue;
+						}
+					}
+				}else if(node.jjtGetFirstToken().image == "tail"){
+					if(n.type != ValueType.LIST){
+						return new SimPLSymbol(ValueType.EXCEPTION,"tail argument is not a list");
+					}else{
+						if(n.value == null)//empty list
+							return new SimPLSymbol(ValueType.EXCEPTION,"tail on nil");
+						else{
+							SimPLSymbol result = n;
+							((ArrayList<SimPLSymbol>)result.value).remove(0);
+							n = result;
+							cur = cur.next;
+							continue;
+						}
+					}
+				}else if(node.jjtGetFirstToken().image == "first"){
+					cur = cur.next;
+					continue;
+				}else if(node.jjtGetFirstToken().image == "snd"){
+					cur = cur.next;
+					continue;
+				}else
+					break;
+			}catch (Exception e){
+				return new SimPLSymbol(ValueType.EXCEPTION,"error in fst,head,tail,snd");
+			}
+			//cur = cur.next;
+		}
+		
+		return n;
 	}
 
 	/* (non-Javadoc)
@@ -104,6 +154,13 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		if(num > 1){
 			try {
 				SimPLSymbol left = (SimPLSymbol)first;
+				if(left.type == ValueType.VAR){
+					if(env.GlobalExist((String)left.value)){
+						left = env.GlobalGetSymbol((String)left.value);
+					}else{
+						return new SimPLSymbol(ValueType.EXCEPTION,"no such symbol "+left.value.toString());
+					}
+				}
 				SimPLSymbol right = null;
 				for(int i = 1; i < num; i++){
 					right = (SimPLSymbol)node.jjtGetChild(i).jjtAccept(this, data);
@@ -177,12 +234,48 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		//System.out.println("in AndOr:"+num);
 		
 		Object first = node.jjtGetChild(0).jjtAccept(this, data);
-		for(int i = 1; i < num;i++){
-			node.jjtGetChild(i).jjtAccept(this, data);
+		try {
+			if(num > 1){
+				boolean sum = true;
+				Object cur = first;
+				boolean sign = true;
+				for(int i = 0; i < num; i++){
+					SimPLSymbol curS = (SimPLSymbol)cur;
+					if(curS.type == ValueType.VAR)
+					{
+						String var = (String)curS.value;
+						if(!env.GlobalExist(var)){
+							return new SimPLSymbol(ValueType.EXCEPTION,"no such symbol "+var);
+						}else {
+							curS =env.GlobalGetSymbol(var);
+						}
+						//sum += (int)cur.value;
+					}
+					if(curS.type == ValueType.BOOLEAN){
+						if(sign)
+							sum = sum && (curS.value.toString()=="true");
+						else
+							sum = sum || (curS.value.toString()=="true");
+					} else if(curS.type == ValueType.EXCEPTION){
+						return curS;
+					}
+					if( i == num -1 )
+						break;
+					SimpleNode last = (SimpleNode)(node.jjtGetChild(i));
+					//System.out.println(last.jjtGetLastToken().next.image);
+					if(last.jjtGetLastToken().next.image == "and")
+						sign = true;
+					else if(last.jjtGetLastToken().next.image == "or")
+						sign = false;
+					cur = node.jjtGetChild(i+1).jjtAccept(this, data);
+				}
+				SimPLSymbol result = new SimPLSymbol(ValueType.BOOLEAN);
+				result.value = sum?"true":"false";
+				return result; 
+			}
 		}
-		if(num > 1){
-			SimPLSymbol result = new SimPLSymbol(ValueType.BOOLEAN);
-			return result; 
+		catch (Exception e){
+			return new SimPLSymbol(ValueType.EXCEPTION,"Err in AddMinus");
 		}
 		return first;
 	}
@@ -246,7 +339,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 					if( i == num -1 )
 						break;
 					SimpleNode last = (SimpleNode)(node.jjtGetChild(i));
-					System.out.println(last.jjtGetLastToken().next.image);
+					//System.out.println(last.jjtGetLastToken().next.image);
 					if(last.jjtGetLastToken().next.image == "+")
 						sign = 1;
 					else
@@ -274,12 +367,48 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		//System.out.println("in MulDiv:"+num);
 		
 		Object first = node.jjtGetChild(0).jjtAccept(this, data);
-		for(int i = 1; i < num;i++){
-			node.jjtGetChild(i).jjtAccept(this, data);
+		try {
+			if(num > 1){
+				int sum = 1;
+				Object cur = first;
+				boolean sign = true;
+				for(int i = 0; i < num; i++){
+					SimPLSymbol curS = (SimPLSymbol)cur;
+					if(curS.type == ValueType.VAR)
+					{
+						String var = (String)curS.value;
+						if(!env.GlobalExist(var)){
+							return new SimPLSymbol(ValueType.EXCEPTION,"no such symbol "+var);
+						}else {
+							curS =env.GlobalGetSymbol(var);
+						}
+						//sum += (int)cur.value;
+					}
+					if(curS.type == ValueType.INTEGER){
+						if(sign)
+							sum = sum * (Integer.parseInt(curS.value.toString()));
+						else
+							sum = sum / (Integer.parseInt(curS.value.toString()));
+					} else if(curS.type == ValueType.EXCEPTION){
+						return curS;
+					}
+					if( i == num -1 )
+						break;
+					SimpleNode last = (SimpleNode)(node.jjtGetChild(i));
+					//System.out.println(last.jjtGetLastToken().next.image);
+					if(last.jjtGetLastToken().next.image == "*")
+						sign = true;
+					else if(last.jjtGetLastToken().next.image == "/")
+						sign = false;
+					cur = node.jjtGetChild(i+1).jjtAccept(this, data);
+				}
+				SimPLSymbol result = new SimPLSymbol(ValueType.INTEGER);
+				result.value = Integer.toString(sum);
+				return result; 
+			}
 		}
-		if(num > 1){
-			SimPLSymbol result = new SimPLSymbol(ValueType.INTEGER);
-			return result; 
+		catch (Exception e){
+			return new SimPLSymbol(ValueType.EXCEPTION,"Err in AddMinus");
 		}
 		return first;
 	}
@@ -292,30 +421,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	@Override
 	public Object visit(ASTUnaryExp node, Object data) {
 		// TODO Auto-generated method stub
-		SimPLSymbol n =(SimPLSymbol) node.jjtGetChild(0).jjtAccept(this,data);
-		if(node.jjtGetFirstToken().image == "head"){
-			if(n.type != ValueType.LIST){
-				return new SimPLSymbol(ValueType.EXCEPTION,"head argument is not a list");
-			}else{
-				if(n.value == null)//empty list
-					return new SimPLSymbol(ValueType.EXCEPTION,"head on nil");
-				else
-					return ((ArrayList<SimPLSymbol>)(n.value)).get(0);
-			}
-		}
-		if(node.jjtGetFirstToken().image == "tail"){
-			if(n.type != ValueType.LIST){
-				return new SimPLSymbol(ValueType.EXCEPTION,"tail argument is not a list");
-			}else{
-				if(n.value == null)//empty list
-					return new SimPLSymbol(ValueType.EXCEPTION,"tail on nil");
-				else{
-					SimPLSymbol result = n;
-					((ArrayList<SimPLSymbol>)result.value).remove(0);
-					return result;
-				}
-			}
-		}
+		node.childrenAccept(this, data);
 		return null;
 	}
 
@@ -330,11 +436,22 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		env.EnterBlock();
 		SimPLSymbol var = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
 		SimPLSymbol value = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+		
 		if(env.LocalExist((String)var.value)){
 			//should never in
 			return new SimPLSymbol(ValueType.EXCEPTION, "var "+var.value+" already exists in let");
 		}
-		env.LocalSetSymbol((String)var.value, value);
+		
+		if(value.type == ValueType.VAR)
+		{
+			if(!env.GlobalExist((String)value.value)){
+				return new SimPLSymbol(ValueType.EXCEPTION, "var "+value.value+" is not defined");
+			}
+			env.LocalSetSymbol((String)var.value, env.GlobalGetSymbol((String)value.value));
+		}
+		else {
+			env.LocalSetSymbol((String)var.value, value);
+		}
 		SimPLSymbol body = (SimPLSymbol)node.jjtGetChild(2).jjtAccept(this, data);
 		
 		return body;
