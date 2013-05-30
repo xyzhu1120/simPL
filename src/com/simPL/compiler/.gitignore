@@ -5,7 +5,6 @@
 /ParseException.java
 /SimPLGrammar.jj
 /SimpleCharStream.java
-/SimpleNode.java
 /Token.java
 /TokenMgrError.java
 /EG2Visitor.java
