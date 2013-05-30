@@ -21,7 +21,6 @@ import com.simPL.compiler.ASTNil;
 import com.simPL.compiler.ASTPair;
 import com.simPL.compiler.ASTSTART;
 import com.simPL.compiler.ASTUnaryExp;
-import com.simPL.compiler.ASTUnaryOP;
 import com.simPL.compiler.ASTVar;
 import com.simPL.compiler.ASTWhile;
 import com.simPL.compiler.SIMPL;
