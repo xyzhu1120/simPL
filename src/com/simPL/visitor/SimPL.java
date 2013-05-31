@@ -19,9 +19,9 @@ public class SimPL {
 	      Object result = n.jjtAccept(new SIMPLVisitorImpl(), null);
 	      SimPLSymbol r = (SimPLSymbol)result;
 	      //if(r.type == ValueType.INTEGER)
-	    	 System.out.println((String)r.value);
-	      if(r.type == ValueType.EXCEPTION)
-		    	 System.out.println((String)r.value);
+	      System.out.println((String)r.value);
+	      //if(r.type == ValueType.EXCEPTION)
+		  //  	 System.out.println((String)r.value);
 	      //n.dump("");
 	    }
 	    catch (Exception e)

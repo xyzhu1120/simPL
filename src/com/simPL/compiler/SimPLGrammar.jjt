@@ -125,7 +125,7 @@ void CompareExp() #Compare:
     | < EQUAL >
   	)
   	AddMinusExp()
-  )*
+  )?
 	)
 }
 

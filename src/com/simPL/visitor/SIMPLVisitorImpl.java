@@ -55,7 +55,16 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	public Object visit(ASTSTART node, Object data) {
 		// TODO Auto-generated method stub
 		//return node.childrenAccept(this, data);
-		return node.jjtGetChild(0).jjtAccept(this, data);
+		
+		SimPLSymbol result = (SimPLSymbol) node.jjtGetChild(0).jjtAccept(this, data);
+		
+		if(result.type == ValueType.VAR){
+			if(env.GlobalExist((String)result.value)){
+				return env.GlobalGetSymbol((String)result.value);
+			}else
+				return new SimPLSymbol(ValueType.EXCEPTION,"not var "+result.value +" exists"); 
+		}
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -283,7 +292,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			}
 		}
 		catch (Exception e){
-			return new SimPLSymbol(ValueType.EXCEPTION,"Err in AddMinus");
+			return new SimPLSymbol(ValueType.EXCEPTION,"Err in AndOr");
 		}
 		return first;
 	}
@@ -298,12 +307,49 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		//System.out.println("in Compare:"+num);
 		
 		Object first = node.jjtGetChild(0).jjtAccept(this, data);
-		for(int i = 1; i < num;i++){
-			node.jjtGetChild(i).jjtAccept(this, data);
+		try {
+			if(num > 1){
+				SimPLSymbol left = (SimPLSymbol)first;
+				if(left.type == ValueType.VAR)
+				 {
+						String var = (String)left.value;
+						if(!env.GlobalExist(var)){
+							return new SimPLSymbol(ValueType.EXCEPTION,"no such symbol "+var);
+						}else {
+							left =env.GlobalGetSymbol(var);
+						}
+				}
+				if(left.type != ValueType.INTEGER)
+					return new SimPLSymbol(ValueType.EXCEPTION,"left in compare need int");
+				SimPLSymbol right = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+				if(right.type == ValueType.VAR)
+				 {
+						String var = (String)right.value;
+						if(!env.GlobalExist(var)){
+							return new SimPLSymbol(ValueType.EXCEPTION,"no such symbol "+var);
+						}else {
+							right =env.GlobalGetSymbol(var);
+						}
+				}
+				if(right.type != ValueType.INTEGER){
+					return new SimPLSymbol(ValueType.EXCEPTION,"right in compare need int");
+				}else{
+					int lv = Integer.parseInt(left.value.toString());
+					int rv = Integer.parseInt(right.value.toString());
+					String op = ((SimpleNode)(node.jjtGetChild(0))).jjtGetLastToken().next.image;
+					SimPLSymbol result = new SimPLSymbol(ValueType.BOOLEAN);
+					if(op=="=")
+						result.value = lv == rv?"true":"false";
+					else if(op==">")
+						result.value = lv > rv?"true":"false";
+					else if(op=="<")
+						result.value = lv < rv?"true":"false";
+					return result;
+				}
+			}
 		}
-		if(num > 1){
-			SimPLSymbol result = new SimPLSymbol(ValueType.BOOLEAN);
-			return result; 
+		catch (Exception e){
+			return new SimPLSymbol(ValueType.EXCEPTION,"Err in Compare");
 		}
 		return first;
 	}
@@ -412,7 +458,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			}
 		}
 		catch (Exception e){
-			return new SimPLSymbol(ValueType.EXCEPTION,"Err in AddMinus");
+			return new SimPLSymbol(ValueType.EXCEPTION,"Err in MultiDiv");
 		}
 		return first;
 	}
@@ -467,8 +513,29 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	@Override
 	public Object visit(ASTCond node, Object data) {
 		// TODO Auto-generated method stub
-		node.childrenAccept(this, data);
-		return null;
+		SimPLSymbol cond = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
+		
+		if(cond.type == ValueType.VAR)
+		{
+			if(!env.GlobalExist((String)cond.value)){
+				return new SimPLSymbol(ValueType.EXCEPTION, "var "+cond.value+" is not defined");
+			}
+			cond = env.GlobalGetSymbol((String)cond.value);
+		}
+		
+		if(cond.type != ValueType.BOOLEAN)
+		{
+			return new SimPLSymbol(ValueType.EXCEPTION,"if condition should be boolean");
+		}
+		
+		if(cond.value.toString() == "true"){
+			SimPLSymbol thenValue = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+			return thenValue;
+		}else{
+			SimPLSymbol elseValue = (SimPLSymbol)node.jjtGetChild(2).jjtAccept(this, data);
+			return elseValue;
+		}
+		
 	}
 
 	/* (non-Javadoc)
@@ -477,8 +544,31 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	@Override
 	public Object visit(ASTWhile node, Object data) {
 		// TODO Auto-generated method stub
-		node.childrenAccept(this, data);
-		return null;
+		
+				
+		while(true){
+			SimPLSymbol cond = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
+			
+			if(cond.type == ValueType.VAR)
+			{
+				if(!env.GlobalExist((String)cond.value)){
+					return new SimPLSymbol(ValueType.EXCEPTION, "var "+cond.value+" is not defined");
+				}
+				cond = env.GlobalGetSymbol((String)cond.value);
+			}
+			
+			if(cond.type != ValueType.BOOLEAN)
+			{
+				return new SimPLSymbol(ValueType.EXCEPTION,"if condition should be boolean");
+			}
+			
+			if(cond.value.toString() == "true"){
+				node.jjtGetChild(1).jjtAccept(this, data);
+			}else {
+				break;
+			}
+		}
+		return new SimPLSymbol(ValueType.UNIT);
 	}
 
 	/* (non-Javadoc)

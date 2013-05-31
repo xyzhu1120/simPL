@@ -19,6 +19,7 @@ in
 	end
 end
 $
+
 let a = 1 in 
 	let b = 1 in
 		b:= a;
@@ -26,4 +27,15 @@ let a = 1 in
 		b:=b+1;
 		b+1
 	end
+end$
+
+let a=1 in
+	if true then a else a:=2 end
+end$
+
+let a = 10 in
+	let b = 10 in 
+		while a > 0 do b := b+1;a := a-1 end
+	end;
+	b
 end$
