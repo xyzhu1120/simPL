@@ -118,9 +118,17 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 							return new SimPLSymbol(ValueType.EXCEPTION,"tail on nil");
 						else{
 							SimPLSymbol result = n;
+							if(((ArrayList<SimPLSymbol>)result.value).size()==1){
+								n.value=null;
+								continue;
+							}else if(((ArrayList<SimPLSymbol>)result.value).size()==1){
+								return new SimPLSymbol(ValueType.EXCEPTION,"tail on nil");
+							}
+							
 							((ArrayList<SimPLSymbol>)result.value).remove(0);
 							n = result;
 							cur = cur.next;
+							
 							continue;
 						}
 					}
@@ -256,8 +264,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 							sum = sum && (curS.value.toString()=="true");
 						else
 							sum = sum || (curS.value.toString()=="true");
-					} else if(curS.type == ValueType.EXCEPTION){
-						return curS;
+					} else {
+						return new SimPLSymbol(ValueType.EXCEPTION,"wrong type in andor, bool needed");
 					}
 					if( i == num -1 )
 						break;
@@ -317,24 +325,20 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				int sign = 1;
 				for(int i = 0; i < num; i++){
 					SimPLSymbol curS = (SimPLSymbol)cur;
+					 if(curS.type == ValueType.VAR)
+					 {
+							String var = (String)curS.value;
+							if(!env.GlobalExist(var)){
+								return new SimPLSymbol(ValueType.EXCEPTION,"no such symbol "+var);
+							}else {
+								curS =env.GlobalGetSymbol(var);
+							}
+							//sum += (int)cur.value;
+					}
 					if(curS.type == ValueType.INTEGER)
 						sum += sign * Integer.parseInt((String)curS.value);
-					else if(curS.type == ValueType.VAR)
-					{
-						String var = (String)curS.value;
-						if(!env.GlobalExist(var)){
-							return new SimPLSymbol(ValueType.EXCEPTION,"no such symbol "+var);
-						}else {
-							SimPLSymbol value =env.GlobalGetSymbol(var);
-							if(value.type != ValueType.INTEGER){
-								return new SimPLSymbol(ValueType.EXCEPTION,"type Int needed: "+var);
-							}else{
-								sum += sign * Integer.parseInt((String)value.value);
-							}
-						}
-						//sum += (int)cur.value;
-					}else if(curS.type == ValueType.EXCEPTION){
-						return curS;
+					else {
+						return new SimPLSymbol(ValueType.EXCEPTION,"wrong type in addminus, integer needed");
 					}
 					if( i == num -1 )
 						break;
@@ -389,8 +393,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 							sum = sum * (Integer.parseInt(curS.value.toString()));
 						else
 							sum = sum / (Integer.parseInt(curS.value.toString()));
-					} else if(curS.type == ValueType.EXCEPTION){
-						return curS;
+					} else {
+						return new SimPLSymbol(ValueType.EXCEPTION,"wrong type in muldiv, integer needed");
 					}
 					if( i == num -1 )
 						break;
@@ -585,6 +589,10 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		Object result = null;
 		for(int i = 0; i < num;i++){
 			result = node.jjtGetChild(i).jjtAccept(this, data);
+			if(i!=num-1)
+				if(((SimPLSymbol)result).type!=ValueType.UNIT){
+					return new SimPLSymbol(ValueType.EXCEPTION, "in-final sequence expression should be unit");
+				}
 		}
 		return result;
 	}
