@@ -56,15 +56,16 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	public Object visit(ASTSTART node, Object data) {
 		// TODO Auto-generated method stub
 		//return node.childrenAccept(this, data);
-		
+		env.EnterBlock();
 		SimPLSymbol result = (SimPLSymbol) node.jjtGetChild(0).jjtAccept(this, data);
-		
+		env.LeaveBlock();
 		if(result.type == ValueType.VAR){
 			if(env.GlobalExist((String)result.value)){
 				return env.GlobalGetSymbol((String)result.value);
 			}else
 				return new SimPLSymbol(ValueType.EXCEPTION,"not var "+result.value +" exists"); 
 		}
+		
 		return result;
 	}
 
@@ -540,27 +541,28 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		// TODO Auto-generated method stub
 		int num = node.jjtGetNumChildren();
 		//System.out.println("in Let:"+num);
-		env.EnterBlock();
+		
 		SimPLSymbol var = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
 		SimPLSymbol value = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
 		
-		if(env.LocalExist((String)var.value)){
-			//should never in
-			return new SimPLSymbol(ValueType.EXCEPTION, "var "+var.value+" already exists in let");
-		}
-		
+//		if(env.LocalExist((String)var.value)){
+//			//should never in
+//			return new SimPLSymbol(ValueType.EXCEPTION, "var "+var.value+" already exists in let");
+//		}
+		env.EnterBlock();
 		if(value.type == ValueType.VAR)
 		{
 			if(!env.GlobalExist((String)value.value)){
 				return new SimPLSymbol(ValueType.EXCEPTION, "var "+value.value+" is not defined");
 			}
+			
 			env.LocalSetSymbol((String)var.value, env.GlobalGetSymbol((String)value.value));
 		}
 		else {
 			env.LocalSetSymbol((String)var.value, value);
 		}
 		SimPLSymbol body = (SimPLSymbol)node.jjtGetChild(2).jjtAccept(this, data);
-		
+		env.LeaveBlock();
 		return body;
 	}
 
@@ -674,24 +676,50 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		int num = node.jjtGetNumChildren();
 		
 		//System.out.println("in Application:"+num);
-		SimPLSymbol func = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
-		for(int i = 1; i < num;i++){
-			node.jjtGetChild(i).jjtAccept(this, data);
-		}
-		if(func.type == ValueType.EXCEPTION)
-			return func;
-		ASTFunction f=null;
-		if (func.type == ValueType.FUN) {
-			f = (ASTFunction) func.value;
-		}else {
-			if(func.type == ValueType.VAR){
-				//f = (ASTFunction)func.value;
-				//look for the symbol table
+		
+		SimPLSymbol param = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+		
+		if(param.type == ValueType.VAR){
+			if(!env.GlobalExist((String)param.value)){
+				return new SimPLSymbol(ValueType.EXCEPTION, "var "+param.value+" is not defined");
 			}else
-				return new SimPLSymbol(ValueType.EXCEPTION,"Wrong in fun first argument");
+				param = env.GlobalGetSymbol(param.value.toString());
 		}
-		SimPLSymbol result = new SimPLSymbol(ValueType.UNIT);
-		return result;
+		
+		SimPLSymbol func = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
+		
+		if(func.type == ValueType.VAR){
+			if(!env.GlobalExist((String)func.value)){
+				return new SimPLSymbol(ValueType.EXCEPTION, "var "+func.value+" is not defined");
+			}else
+				func = env.GlobalGetSymbol(func.value.toString());
+		}
+		
+		if (func.type == ValueType.FUN) {
+			MyFunc f = (MyFunc) (func.value);
+			if(f.level == 0) {
+				SimPLSymbol var = f.param;
+				env.EnterBlock();
+				env.LocalSetSymbol(var.value.toString(), param);
+				SimPLSymbol exp = (SimPLSymbol)f.node.jjtAccept(this, data);
+				
+				if(exp.type == ValueType.VAR){
+					exp = env.GlobalGetSymbol(exp.value.toString());
+				}
+				env.LeaveBlock();
+				return exp;
+			}else {
+				
+				SimPLSymbol var = f.param;
+				
+				env.LocalSetSymbol(var.value.toString(), param);
+				return f.body;
+			}
+			
+		}else {
+			return new SimPLSymbol(ValueType.EXCEPTION,"application need fun type");
+		}
+		
 	}
 
 	/* (non-Javadoc)
@@ -701,7 +729,19 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	public Object visit(ASTFunction node, Object data) {
 		// TODO Auto-generated method stub
 		//node.childrenAccept(this, data);
-		SimPLSymbol result = new SimPLSymbol(ValueType.FUN,node);
+		
+		SimPLSymbol param = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
+		env.EnterBlock();
+		env.LocalSetSymbol(param.value.toString(), new SimPLSymbol(ValueType.FREE));
+		SimPLEnv envbak = env.Duplicate();
+		SimPLSymbol body = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+		env = envbak;
+		int level = 0;
+		if(body.type == ValueType.FUN)
+			level = ((MyFunc)(body.value)).level+1;
+		SimPLSymbol result = new SimPLSymbol(ValueType.FUN);
+		result.value = new MyFunc(param,level,body,(SimpleNode)node.jjtGetChild(1));
+		env.LeaveBlock();
 		return result;
 	}
 

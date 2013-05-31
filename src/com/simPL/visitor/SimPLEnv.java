@@ -18,31 +18,38 @@ public class SimPLEnv implements SIMPLTreeConstants, SIMPLConstants{
 	private Vector<HashMap<String, SimPLSymbol>> stack = null;
 	
 	public SimPLEnv(){
-		
 		stack = new Vector<HashMap<String, SimPLSymbol>>();
 		curenv = null;
 	}
-	
+	public SimPLEnv Duplicate(){
+		SimPLEnv result = new SimPLEnv();
+		result.stack = new Vector<HashMap<String, SimPLSymbol>>(stack); 
+		return result;
+	}
 	public int EnterBlock(){
-		curenv = new HashMap<String, SimPLSymbol>();
-		stack.add(curenv);
+		stack.add(new HashMap<String, SimPLSymbol>());
+		curenv = stack.get(stack.size()-1);
 		return stack.size();
 	}
 	public int LeaveBlock(){
 		stack.remove(stack.size()-1);
+		curenv = null;
 		return stack.size();
 	}
 	
 	public boolean LocalExist(String name){
+		curenv = stack.get(stack.size()-1);
 		return curenv.containsKey(name);
 	}
 	
 	public int LocalSetSymbol(String name, SimPLSymbol symbol){
+		SimPLSymbol value = new SimPLSymbol(symbol.type,symbol.value);
+		curenv = stack.get(stack.size()-1);
 		if(curenv.containsKey(name)){
-			curenv.put(name, symbol);
+			curenv.put(name, value);
 			return 0;
 		}else {
-			curenv.put(name, symbol);
+			curenv.put(name, value);
 			return 1;
 		}
 	}
@@ -64,10 +71,11 @@ public class SimPLEnv implements SIMPLTreeConstants, SIMPLConstants{
 	}
 	
 	public int GlobalSetSymbol(String name, SimPLSymbol newValue){
+		SimPLSymbol value = new SimPLSymbol(newValue.type,newValue.value);
 		int i = 0;
 		for(; i < stack.size(); i++){
 			if(stack.get(stack.size()-1-i).containsKey(name)){
-				stack.get(stack.size()-1-i).put(name,newValue);
+				stack.get(stack.size()-1-i).put(name,value);
 				return i;
 			}
 		}

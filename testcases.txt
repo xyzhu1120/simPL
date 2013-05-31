@@ -1,7 +1,7 @@
 let 
 	mod = 
 		fun x -> 
-			fun y -> x + x - x / y * y 
+			fun y -> x - x / y * y 
 			end 
 		end
 in 
@@ -11,7 +11,7 @@ in
 				fun y -> 
 					if (( mod x ) y) = 0 
 						then y 
-						else ((gcd y),((mod x) y)) 
+						else ((gcd y)((mod x) y)) 
 					end 
 				end 
 			end
@@ -38,4 +38,14 @@ let a = 10 in
 		while a > 0 do b := b+1;a := a-1 end
 	end;
 	b
+end$
+
+let 
+	mod = 
+		fun x -> 
+			fun y -> x - x / y * y 
+			end 
+		end
+in 
+	((mod 100) 7)
 end$

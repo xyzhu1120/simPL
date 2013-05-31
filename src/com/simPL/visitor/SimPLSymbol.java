@@ -1,7 +1,7 @@
 package com.simPL.visitor;
 
 enum ValueType{
-	INTEGER,BOOLEAN,LIST,UNIT,PAIR,VAR,FUN,EXCEPTION
+	INTEGER,BOOLEAN,LIST,UNIT,PAIR,VAR,FUN,FREE,EXCEPTION
 }
 public class SimPLSymbol {
 	
@@ -38,8 +38,8 @@ public class SimPLSymbol {
 	}
 	
 	public SimPLSymbol(ValueType theType){
-		if(theType == ValueType.EXCEPTION)
-			System.err.println("exception happens");
+		//if(theType == ValueType.EXCEPTION)
+		//	System.err.println("exception happens");
 		type = theType;
 	}
 	public SimPLSymbol(ValueType theType, Object theValue){
