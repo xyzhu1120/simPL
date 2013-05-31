@@ -5,9 +5,9 @@ public class MyPair {
 	/**
 	 * @param args
 	 */
-	public Object first;
-	public Object second;
-	public MyPair(Object theFirst, Object theSecond){
+	public SimPLSymbol first;
+	public SimPLSymbol second;
+	public MyPair(SimPLSymbol theFirst, SimPLSymbol theSecond){
 		first = theFirst;
 		second = theSecond;
 	}

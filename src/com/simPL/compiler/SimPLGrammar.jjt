@@ -165,8 +165,9 @@ void PrimaryExp() #void:{}
 
 void UnaryExp():
 {}{
-  < TILDE >
+  (    < TILDE > 
 | < NOT >
+)
 //| < FST >
 //| < SND >
 //| < HEAD >
@@ -192,6 +193,10 @@ void WhileExp() #While:
 void BracketExp() #void:
 {}
 {
+  LOOKAHEAD(< LPAREN >< RPAREN >)
+  (    < LPAREN >< RPAREN >
+  )#Unit
+| 
   LOOKAHEAD(< LPAREN >Expression()< COMMA >)
   (    < LPAREN >Expression()< COMMA >Expression()< RPAREN >
   )#Pair 

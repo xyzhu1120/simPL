@@ -21,6 +21,7 @@ import com.simPL.compiler.ASTNil;
 import com.simPL.compiler.ASTPair;
 import com.simPL.compiler.ASTSTART;
 import com.simPL.compiler.ASTUnaryExp;
+import com.simPL.compiler.ASTUnit;
 import com.simPL.compiler.ASTVar;
 import com.simPL.compiler.ASTWhile;
 import com.simPL.compiler.SIMPL;
@@ -103,9 +104,23 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			return result;
 		}
 		
-		SimPLSymbol n = left;
+		List<Token> list= new ArrayList<Token>();
 		Token cur = node.jjtGetFirstToken();
 		while(cur != ((SimpleNode)node.jjtGetChild(0)).jjtGetFirstToken()){
+			list.add(0,cur);
+			cur = cur.next;
+		}
+		
+		SimPLSymbol n = left;
+		for(int i = 0; i < list.size();i++){
+			//SimPLSymbol n = new SimPLSymbol(left.type,left.value);
+			cur = list.get(i);
+			if(n.type == ValueType.VAR){
+				if(env.GlobalExist((String)n.value)){
+					n = env.GlobalGetSymbol((String)n.value);
+				}else
+					return new SimPLSymbol(ValueType.EXCEPTION,"not var "+n.value +" exists"); 
+			}
 			try{
 				if(cur.image == "head"){
 					if(n.type != ValueType.LIST){
@@ -119,7 +134,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 							continue;
 						}
 					}
-				}else if(node.jjtGetFirstToken().image == "tail"){
+				}else if(cur.image == "tail"){
 					if(n.type != ValueType.LIST){
 						return new SimPLSymbol(ValueType.EXCEPTION,"tail argument is not a list");
 					}else{
@@ -141,14 +156,30 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 							continue;
 						}
 					}
-				}else if(node.jjtGetFirstToken().image == "first"){
-					cur = cur.next;
-					continue;
-				}else if(node.jjtGetFirstToken().image == "snd"){
-					cur = cur.next;
-					continue;
-				}else
-					break;
+				}else if(cur.image == "fst"){
+					if(n.type != ValueType.PAIR){
+						return new SimPLSymbol(ValueType.EXCEPTION,"fst argument is not a pair");
+					}else{
+						
+							MyPair p  = (MyPair)(n.value);
+							n = (SimPLSymbol)p.first;
+							cur = cur.next;
+							continue;
+					}
+				}else if(cur.image == "snd"){
+					if(n.type != ValueType.PAIR){
+						return new SimPLSymbol(ValueType.EXCEPTION,"snd argument is not a pair");
+					}else{
+						
+							MyPair p  = (MyPair)(n.value);
+							n = (SimPLSymbol)p.second;
+							cur = cur.next;
+							continue;
+					}
+				}else {
+					return new SimPLSymbol(ValueType.EXCEPTION,"error in fst,head,tail,snd");
+					
+				}
 			}catch (Exception e){
 				return new SimPLSymbol(ValueType.EXCEPTION,"error in fst,head,tail,snd");
 			}
@@ -198,7 +229,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 							try{
 								List<SimPLSymbol> list = (ArrayList<SimPLSymbol>)right.value;
 								if(SameListLevel(left,list.get(0))){
-									list.add(left);
+									//list.add(left);
+									list.add(0,left);
 									//right.value=list;
 								}else{
 									return new SimPLSymbol(ValueType.EXCEPTION,"list level not matched");
@@ -471,8 +503,33 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	@Override
 	public Object visit(ASTUnaryExp node, Object data) {
 		// TODO Auto-generated method stub
-		node.childrenAccept(this, data);
-		return null;
+		SimPLSymbol value = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
+		if(((SimpleNode)node).jjtGetFirstToken().image == "not"){
+			if(value.type == ValueType.VAR)
+			{
+				if(!env.GlobalExist((String)value.value)){
+					return new SimPLSymbol(ValueType.EXCEPTION, "var "+value.value+" is not defined");
+				}else
+					value = env.GlobalGetSymbol(value.value.toString());
+			}
+			if(value.type != ValueType.BOOLEAN)
+				return new SimPLSymbol(ValueType.EXCEPTION, "not op should be followed by a boolean"); 
+			value.value = value.value=="true"?"false":"true";
+			return value;
+		}else {
+			if(value.type == ValueType.VAR)
+			{
+				if(!env.GlobalExist((String)value.value)){
+					return new SimPLSymbol(ValueType.EXCEPTION, "var "+value.value+" is not defined");
+				}else
+					value = env.GlobalGetSymbol(value.value.toString());
+			}
+			if(value.type != ValueType.INTEGER)
+				return new SimPLSymbol(ValueType.EXCEPTION, "~ op should be followed by a int"); 
+			value.value = Integer.toString(~Integer.parseInt(value.value.toString()));
+			return value;
+		}
+		
 	}
 
 	/* (non-Javadoc)
@@ -587,8 +644,22 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		// TODO Auto-generated method stub
 		int num = node.jjtGetNumChildren();
 		
-		Object first = node.jjtGetChild(0).jjtAccept(this, data);
-		Object second = node.jjtGetChild(1).jjtAccept(this, data);
+		SimPLSymbol first = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
+		if(first.type == ValueType.VAR)
+		{
+			if(!env.GlobalExist((String)first.value)){
+				return new SimPLSymbol(ValueType.EXCEPTION, "var "+first.value+" is not defined");
+			}
+			first = env.GlobalGetSymbol((String)first.value);
+		}
+		SimPLSymbol second = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+		if(second.type == ValueType.VAR)
+		{
+			if(!env.GlobalExist((String)second.value)){
+				return new SimPLSymbol(ValueType.EXCEPTION, "var "+second.value+" is not defined");
+			}
+			second = env.GlobalGetSymbol((String)second.value);
+		}
 		SimPLSymbol result = new SimPLSymbol(ValueType.PAIR);
 		result.value = new MyPair(first,second);
 		return result;
@@ -695,6 +766,14 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		result.value = null;
 		//System.out.println("In Bool Node, return:"+result.value.toString());
 		return result;
+	}
+
+	@Override
+	public Object visit(ASTUnit node, Object data) {
+		// TODO Auto-generated method stub
+		
+		return new SimPLSymbol(ValueType.UNIT);
+		
 	}
 
 }
