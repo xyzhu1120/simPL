@@ -49,3 +49,5 @@ let
 in 
 	((mod 100) 7)
 end$
+
+let x = fun y -> if true then y else y:=2 end end in (x 1) end$

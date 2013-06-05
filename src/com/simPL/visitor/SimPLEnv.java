@@ -36,7 +36,17 @@ public class SimPLEnv implements SIMPLTreeConstants, SIMPLConstants{
 		curenv = null;
 		return stack.size();
 	}
-	
+	public int GetDepth(){
+		return stack.size();
+	}
+	public int PopStackToDepth(int depth){
+		if(depth >= GetDepth())
+			return 0;
+		int cnt = 0;
+		for(int i = stack.size()-1; i >= depth; i--,cnt++)
+			stack.remove(i);
+		return cnt;
+	}
 	public boolean LocalExist(String name){
 		curenv = stack.get(stack.size()-1);
 		return curenv.containsKey(name);
