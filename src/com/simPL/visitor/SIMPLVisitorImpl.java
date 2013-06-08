@@ -79,8 +79,41 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		int num = node.jjtGetNumChildren();
 		//System.out.println("in Assignment:"+num);
 		SimPLSymbol left = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
+		
 		if(num > 1){
+			if(node.jjtGetFirstToken().image == "head" || node.jjtGetFirstToken().image == "tail" || node.jjtGetFirstToken().image == "fst" || node.jjtGetFirstToken().image == "snd"){
+				return new SimPLSymbol(ValueType.EXCEPTION,"cannot operate on a unit");
+			}
+			String leftName = "";
+			if(left.type != ValueType.VAR){
+				return new SimPLSymbol(ValueType.EXCEPTION,":= left param should be a variable");
+			}
+			leftName = left.value.toString();
+			if(!env.GlobalExist(leftName)){
+				return new SimPLSymbol(ValueType.EXCEPTION,"var "+leftName+" does not exist in assignment");
+			}
+			ValueType leftType = env.GlobalGetSymbol(leftName).type;
+			
 			SimPLSymbol right = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+			String rightName = "";
+			if(right.type == ValueType.VAR)
+			{
+				rightName = right.value.toString();
+				if(!env.GlobalExist((String)right.value)){
+					return new SimPLSymbol(ValueType.EXCEPTION, "var "+rightName+" is not defined");
+				}
+				right = env.GlobalGetSymbol((String)right.value);
+			}
+			if(right.type == ValueType.FREE && left.type == ValueType.FREE){
+				return new SimPLSymbol(ValueType.UNIT);
+			}
+			if(right.type == ValueType.FREE && left.type != ValueType.FREE){
+				env.GlobalSetSymbol(rightName, left);
+				return new SimPLSymbol(ValueType.UNIT);
+			}
+			env.GlobalSetSymbol(leftName, right);
+			return new SimPLSymbol(ValueType.UNIT);
+			/*SimPLSymbol right = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
 			if(left.type == ValueType.VAR){
 				if(env.GlobalExist((String)left.value)){
 					SimPLSymbol ori = env.GlobalGetSymbol((String)left.value);
@@ -100,6 +133,9 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 						env.GlobalSetSymbol(rightName, left);
 					}else if(ori.type == right.type)
 					{
+						//pair/fun/list do not match yet
+						
+						
 						env.GlobalSetSymbol((String)left.value, right);
 					}else{
 						return new SimPLSymbol(ValueType.EXCEPTION,"type not match in assignment");						
@@ -109,12 +145,12 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				}
 			}else{
 				return new SimPLSymbol(ValueType.EXCEPTION,"not a left var in assignment");
-			}
-			SimPLSymbol result = new SimPLSymbol(ValueType.UNIT);
-			if(node.jjtGetFirstToken().image == "head" || node.jjtGetFirstToken().image == "tail" || node.jjtGetFirstToken().image == "fst" || node.jjtGetFirstToken().image == "snd"){
+			}*/
+			//SimPLSymbol result = new SimPLSymbol(ValueType.UNIT);
+			/*if(node.jjtGetFirstToken().image == "head" || node.jjtGetFirstToken().image == "tail" || node.jjtGetFirstToken().image == "fst" || node.jjtGetFirstToken().image == "snd"){
 				return new SimPLSymbol(ValueType.EXCEPTION,"cannot operate on a unit");
-			}
-			return result;
+			}*/
+			//return result;
 		}
 		
 		List<Token> list= new ArrayList<Token>();
@@ -214,8 +250,10 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		Object first = node.jjtGetChild(0).jjtAccept(this, data);
 		if(num > 1){
 			try {
+				String leftName="";
 				SimPLSymbol left = (SimPLSymbol)first;
 				if(left.type == ValueType.VAR){
+					leftName=left.value.toString();
 					if(env.GlobalExist((String)left.value)){
 						left = env.GlobalGetSymbol((String)left.value);
 					}else{
@@ -241,7 +279,34 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 						}else{
 							try{
 								List<SimPLSymbol> list = (ArrayList<SimPLSymbol>)right.value;
-								if(SameListLevel(left,list.get(0))){
+								ValueType listType = list.get(0).type;
+								SimPLSymbol listSample = list.get(0);
+								for(int j = 0; j < list.size(); j++){
+									ValueType curType = list.get(j).type;
+									if(curType != ValueType.FREE){
+										if(listType==ValueType.FREE){
+											listSample = list.get(j);
+											listType=curType;
+											break;
+										}else if(listType != curType){
+											return new SimPLSymbol(ValueType.EXCEPTION, "list value not the same type");
+										}
+									}
+								}
+								for(int j = 0; j < list.size(); j++){
+									ValueType curType = list.get(j).type;
+									if(curType == ValueType.FREE){
+										//runtime check only
+										System.out.println("warning, free value in list");
+									}
+								}
+								if(left.type == ValueType.FREE && listType != ValueType.FREE)
+								{
+									//left = new SimPLSymbol(listType);
+									left = listSample;
+									env.GlobalSetSymbol(leftName, left);
+								}
+								if(SameListLevel(left,listSample)){
 									//list.add(left);
 									list.add(0,left);
 									//right.value=list;
@@ -269,10 +334,18 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	}
 
 	private boolean SameListLevel(SimPLSymbol left, SimPLSymbol right){
-		if(left.type == ValueType.VAR)
+		if(left.type == ValueType.VAR){
 			left = env.GlobalGetSymbol((String)left.value);
-		if(right.type == ValueType.VAR)
+		}
+		if(right.type == ValueType.VAR){
 			right = env.GlobalGetSymbol((String)right.value);
+		}
+		
+		if(left.type == ValueType.FREE || right.type == ValueType.FREE)
+		{
+			return true;
+		}
+		
 		if(right.type != left.type)
 			return false;
 		if(left.type != ValueType.LIST)

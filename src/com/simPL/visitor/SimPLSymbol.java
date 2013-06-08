@@ -43,6 +43,12 @@ public class SimPLSymbol {
 		//if(theType == ValueType.EXCEPTION)
 		//	System.err.println("exception happens");
 		type = theType;
+		if(type==ValueType.BOOLEAN)
+			value = "true";
+		if(type == ValueType.INTEGER)
+			value = "1";
+		if(type == ValueType.LIST)
+			value = null;
 	}
 	public SimPLSymbol(ValueType theType, Object theValue){
 		if(theType == ValueType.EXCEPTION)
