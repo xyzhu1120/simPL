@@ -225,7 +225,13 @@ void Nil() #Nil:
 {}{
   < NIL >}
 void Function() #Function:
-{}{  < FUN > Variable()< ANONYFUN > Expression() < END >
+{}{  < FUN > Variable()< ANONYFUN >
+  (    LOOKAHEAD (Expression() < END >)
+  	(    Expression() < END >
+	)
+|
+	AssignExp()
+  )   
 }
 
 void Variable() #Var:
