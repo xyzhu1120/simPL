@@ -1,7 +1,7 @@
 package com.simPL.visitor;
 
 enum ValueType{
-	INTEGER,BOOLEAN,LIST,UNIT,PAIR,VAR,FUN,FREE,EXCEPTION
+	INTEGER,BOOLEAN,LIST,UNIT,PAIR,VAR,FUN,FREE,UNDEF,EXCEPTION
 }
 public class SimPLSymbol {
 	
@@ -35,6 +35,8 @@ public class SimPLSymbol {
 			System.out.println("Fun");
 		if(type == ValueType.EXCEPTION)
 			System.out.println(value.toString());
+		if(type == ValueType.UNDEF)
+			System.out.println("undefine");
 	}
 	
 	public SimPLSymbol(ValueType theType){

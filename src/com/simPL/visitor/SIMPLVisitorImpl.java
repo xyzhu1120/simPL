@@ -158,7 +158,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 							if(((ArrayList<SimPLSymbol>)result.value).size()==1){
 								n.value=null;
 								continue;
-							}else if(((ArrayList<SimPLSymbol>)result.value).size()==1){
+							}else if(((ArrayList<SimPLSymbol>)result.value).size()==0){
 								return new SimPLSymbol(ValueType.EXCEPTION,"tail on nil");
 							}
 							
@@ -318,6 +318,9 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 						curS = new SimPLSymbol(ValueType.BOOLEAN,"true");
 						env.GlobalSetSymbol(varName, curS);
 					}
+					//if(curS.type == ValueType.UNDEF){
+					//	return new SimPLSymbol(ValueType.UNDEF);
+					//}
 					if(curS.type == ValueType.BOOLEAN){
 						if(sign)
 							sum = sum && (curS.value.toString()=="true");
@@ -369,8 +372,12 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 							left =env.GlobalGetSymbol(var);
 						}
 				}
+				if(left.type == ValueType.UNDEF)
+					return new SimPLSymbol(ValueType.UNDEF);
 				if(left.type != ValueType.INTEGER)
+				{
 					return new SimPLSymbol(ValueType.EXCEPTION,"left in compare need int");
+				}
 				SimPLSymbol right = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
 				if(right.type == ValueType.VAR)
 				 {
@@ -381,6 +388,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 							right =env.GlobalGetSymbol(var);
 						}
 				}
+				if(right.type == ValueType.UNDEF)
+					return new SimPLSymbol(ValueType.UNDEF);
 				if(right.type != ValueType.INTEGER){
 					return new SimPLSymbol(ValueType.EXCEPTION,"right in compare need int");
 				}else{
@@ -437,6 +446,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 						curS = new SimPLSymbol(ValueType.INTEGER,"0");
 						env.GlobalSetSymbol(varName, curS);
 					}
+					if(curS.type == ValueType.UNDEF)
+						return new SimPLSymbol(ValueType.UNDEF);
 					if(curS.type == ValueType.INTEGER)
 						sum += sign * Integer.parseInt((String)curS.value);
 					else {
@@ -499,8 +510,12 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 					if(curS.type == ValueType.INTEGER){
 						if(sign)
 							sum = sum * (Integer.parseInt(curS.value.toString()));
-						else
-							sum = sum / (Integer.parseInt(curS.value.toString()));
+						else {
+							int division = (Integer.parseInt(curS.value.toString()));
+							if(division == 0)
+								return new SimPLSymbol(ValueType.UNDEF);
+							sum = sum / division;
+						}
 					} else {
 						return new SimPLSymbol(ValueType.EXCEPTION,"wrong type in muldiv, integer needed");
 					}
@@ -566,6 +581,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				value = new SimPLSymbol(ValueType.INTEGER,"0");
 				env.GlobalSetSymbol(var, value);
 			}
+			if(value.type == ValueType.UNDEF)
+				return new SimPLSymbol(ValueType.UNDEF);
 			if(value.type != ValueType.INTEGER)
 				return new SimPLSymbol(ValueType.EXCEPTION, "~ op should be followed by a int"); 
 			value.value = Integer.toString(~Integer.parseInt(value.value.toString()));

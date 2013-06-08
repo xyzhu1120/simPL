@@ -130,5 +130,4 @@ public class SimPLEnv implements SIMPLTreeConstants, SIMPLConstants{
 			env.LocalSetSymbol("b", new SimPLSymbol(ValueType.INTEGER));
 		env.PrintStack();
 	}
-
 }
