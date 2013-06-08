@@ -88,11 +88,11 @@ void Expression() #Expression:
 
 void AssignExp() #Assignment:{}
 {
-  (    < FST >
-| < SND >
-| < HEAD >
-| < TAIL >
-)*    ListExp()
+//  (//    < FST >
+//| < SND >
+//| < HEAD >
+//| < TAIL >
+//)*    ListExp()
   (    < ASSIGN >ListExp()
   )?
 }
@@ -167,11 +167,12 @@ void UnaryExp():
 {}{
   (    < TILDE > 
 | < NOT >
+
+| < FST >
+| < SND >
+| < HEAD >
+| < TAIL >
 )
-//| < FST >
-//| < SND >
-//| < HEAD >
-//| < TAIL >
   PrimaryExp()
 }
 

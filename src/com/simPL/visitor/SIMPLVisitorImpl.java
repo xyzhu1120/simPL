@@ -81,9 +81,9 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		SimPLSymbol left = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
 		
 		if(num > 1){
-			if(node.jjtGetFirstToken().image == "head" || node.jjtGetFirstToken().image == "tail" || node.jjtGetFirstToken().image == "fst" || node.jjtGetFirstToken().image == "snd"){
+/*			if(node.jjtGetFirstToken().image == "head" || node.jjtGetFirstToken().image == "tail" || node.jjtGetFirstToken().image == "fst" || node.jjtGetFirstToken().image == "snd"){
 				return new SimPLSymbol(ValueType.EXCEPTION,"cannot operate on a unit");
-			}
+			}*/
 			String leftName = "";
 			if(left.type != ValueType.VAR){
 				return new SimPLSymbol(ValueType.EXCEPTION,":= left param should be a variable");
@@ -113,55 +113,17 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			}
 			env.GlobalSetSymbol(leftName, right);
 			return new SimPLSymbol(ValueType.UNIT);
-			/*SimPLSymbol right = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
-			if(left.type == ValueType.VAR){
-				if(env.GlobalExist((String)left.value)){
-					SimPLSymbol ori = env.GlobalGetSymbol((String)left.value);
-					//SimPLSymbol right2= new SimPLSymbol(right.type,right.value);
-					String rightName = "";
-					if(right.type==ValueType.VAR){
-						rightName = right.value.toString();
-						right = env.GlobalGetSymbol(right.value.toString());
-						if(right.type == ValueType.FREE)
-							return new SimPLSymbol(ValueType.EXCEPTION,"value of var should never be free");
-					}
-					if(ori.type == ValueType.FREE && right.type == ValueType.FREE){
-						
-					}else if(ori.type == ValueType.FREE){
-						env.GlobalSetSymbol(left.value.toString(), right);
-					}else if(right.type == ValueType.FREE){
-						env.GlobalSetSymbol(rightName, left);
-					}else if(ori.type == right.type)
-					{
-						//pair/fun/list do not match yet
-						
-						
-						env.GlobalSetSymbol((String)left.value, right);
-					}else{
-						return new SimPLSymbol(ValueType.EXCEPTION,"type not match in assignment");						
-					}
-				}else{
-					return new SimPLSymbol(ValueType.EXCEPTION,"var "+(String)left.value+" not exist in assignment");
-				}
-			}else{
-				return new SimPLSymbol(ValueType.EXCEPTION,"not a left var in assignment");
-			}*/
-			//SimPLSymbol result = new SimPLSymbol(ValueType.UNIT);
-			/*if(node.jjtGetFirstToken().image == "head" || node.jjtGetFirstToken().image == "tail" || node.jjtGetFirstToken().image == "fst" || node.jjtGetFirstToken().image == "snd"){
-				return new SimPLSymbol(ValueType.EXCEPTION,"cannot operate on a unit");
-			}*/
-			//return result;
 		}
 		
-		List<Token> list= new ArrayList<Token>();
+		/*List<Token> list= new ArrayList<Token>();
 		Token cur = node.jjtGetFirstToken();
 		while(cur != ((SimpleNode)node.jjtGetChild(0)).jjtGetFirstToken()){
 			list.add(0,cur);
 			cur = cur.next;
-		}
+		}*/
 		
 		SimPLSymbol n = left;
-		for(int i = 0; i < list.size();i++){
+		/*for(int i = 0; i < list.size();i++){
 			//SimPLSymbol n = new SimPLSymbol(left.type,left.value);
 			cur = list.get(i);
 			if(n.type == ValueType.VAR){
@@ -233,7 +195,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				return new SimPLSymbol(ValueType.EXCEPTION,"error in fst,head,tail,snd");
 			}
 			//cur = cur.next;
-		}
+		}*/
 		
 		return n;
 	}
@@ -622,7 +584,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	public Object visit(ASTUnaryExp node, Object data) {
 		// TODO Auto-generated method stub
 		SimPLSymbol value = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
-		if(((SimpleNode)node).jjtGetFirstToken().image == "not"){
+		String op = ((SimpleNode)node).jjtGetFirstToken().image;
+		if(op == "not"){
 			String var="";
 			if(value.type == ValueType.VAR)
 			{
@@ -640,7 +603,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				return new SimPLSymbol(ValueType.EXCEPTION, "not op should be followed by a boolean"); 
 			value.value = value.value=="true"?"false":"true";
 			return value;
-		}else {
+		}else if(op == "~"){
 			String var="";
 			if(value.type == ValueType.VAR)
 			{
@@ -660,8 +623,52 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				return new SimPLSymbol(ValueType.EXCEPTION, "~ op should be followed by a int"); 
 			value.value = Integer.toString(~Integer.parseInt(value.value.toString()));
 			return value;
+		}else if(op == "fst" || op == "snd"){
+			String var="";
+			if(value.type == ValueType.VAR)
+			{
+				var = (String)value.value;
+				if(!env.GlobalExist(var)){
+					return new SimPLSymbol(ValueType.EXCEPTION, "var "+value.value+" is not defined");
+				}else
+					value = env.GlobalGetSymbol(value.value.toString());
+			}
+			if(value.type==ValueType.FREE){
+				MyPair mine = new MyPair(new SimPLSymbol(ValueType.FREE),new SimPLSymbol(ValueType.FREE));
+				value = new SimPLSymbol(ValueType.PAIR,mine);
+				env.GlobalSetSymbol(var, value);
+			}
+			if(value.type != ValueType.PAIR)
+				return new SimPLSymbol(ValueType.EXCEPTION, "fst/snd should be followed by a pair"); 
+			return op=="fst"?((MyPair)value.value).first:((MyPair)value.value).second;
+		}else if(op == "head" || op == "tail"){
+			String var="";
+			if(value.type == ValueType.VAR)
+			{
+				var = (String)value.value;
+				if(!env.GlobalExist(var)){
+					return new SimPLSymbol(ValueType.EXCEPTION, "var "+value.value+" is not defined");
+				}else
+					value = env.GlobalGetSymbol(value.value.toString());
+			}
+			if(value.type==ValueType.FREE){
+				value =  new SimPLSymbol(ValueType.LIST,null);
+				env.GlobalSetSymbol(var, value);
+			}
+			if(value.type != ValueType.LIST)
+				return new SimPLSymbol(ValueType.EXCEPTION, "head/tail should be followed by a list");
+			List<SimPLSymbol> list = (List<SimPLSymbol>)value.value;
+			if(list == null)
+				return new SimPLSymbol(ValueType.EXCEPTION, "head/tail on a nil");
+			if(op == "head"){
+				return list.get(0);
+			}else{
+				list.remove(0);
+				
+				return value;
+			}
 		}
-		
+		return new SimPLSymbol(ValueType.EXCEPTION,"not such unary op "+op);
 	}
 
 	/* (non-Javadoc)
@@ -706,7 +713,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		SimPLSymbol cond = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
 		String var = "";
 		
-		SimPLEnv envbak = env.Duplicate();
+		/*SimPLEnv envbak = env.Duplicate();
 		SimPLSymbol thenValue = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
 		var ="";
 		if(thenValue.type == ValueType.VAR){
@@ -734,7 +741,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				env.GlobalSetSymbol(var, elseValue);
 			}else
 				env.GlobalSetSymbol(var2, thenValue);
-		}
+		}*/
 		
 		if(cond.type == ValueType.VAR)
 		{
@@ -755,11 +762,9 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		}
 		
 		if(cond.value.toString() == "true"){
-			thenValue = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
-			return thenValue;
+			return node.jjtGetChild(1).jjtAccept(this, data);
 		}else{
-			elseValue = (SimPLSymbol)node.jjtGetChild(2).jjtAccept(this, data);
-			return elseValue;
+			return node.jjtGetChild(2).jjtAccept(this, data);
 		}
 		
 	}
