@@ -4,6 +4,6 @@
 *.jar
 *.war
 *.ear
-#*.project
+*.project
 /bin
-#/.settings
+/.settings
