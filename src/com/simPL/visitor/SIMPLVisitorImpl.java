@@ -398,8 +398,10 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		try {
 			if(num > 1){
 				SimPLSymbol left = (SimPLSymbol)first;
+				String leftName = "";
 				if(left.type == ValueType.VAR)
 				 {
+					leftName = left.value.toString();
 						String var = (String)left.value;
 						if(!env.GlobalExist(var)){
 							return new SimPLSymbol(ValueType.EXCEPTION,"no such symbol "+var);
@@ -409,13 +411,19 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				}
 				if(left.type == ValueType.UNDEF)
 					return new SimPLSymbol(ValueType.UNDEF);
+				if(left.type == ValueType.FREE){
+					left = new SimPLSymbol(ValueType.INTEGER);
+					env.GlobalSetSymbol(leftName, left);
+				}
 				if(left.type != ValueType.INTEGER)
 				{
 					return new SimPLSymbol(ValueType.EXCEPTION,"left in compare need int");
 				}
 				SimPLSymbol right = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+				String rightName="";
 				if(right.type == ValueType.VAR)
 				 {
+					rightName = right.value.toString();
 						String var = (String)right.value;
 						if(!env.GlobalExist(var)){
 							return new SimPLSymbol(ValueType.EXCEPTION,"no such symbol "+var);
@@ -425,6 +433,10 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				}
 				if(right.type == ValueType.UNDEF)
 					return new SimPLSymbol(ValueType.UNDEF);
+				if(right.type == ValueType.FREE){
+					right = new SimPLSymbol(ValueType.INTEGER);
+					env.GlobalSetSymbol(rightName, right);
+				}
 				if(right.type != ValueType.INTEGER){
 					return new SimPLSymbol(ValueType.EXCEPTION,"right in compare need int");
 				}else{
@@ -681,13 +693,16 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		//System.out.println("in Let:"+num);
 		
 		SimPLSymbol var = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
-		SimPLSymbol value = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+		
+		
 		
 //		if(env.LocalExist((String)var.value)){
 //			//should never in
 //			return new SimPLSymbol(ValueType.EXCEPTION, "var "+var.value+" already exists in let");
 //		}
 		env.EnterBlock();
+		env.LocalSetSymbol((String)var.value, new SimPLSymbol(ValueType.FREE));
+		SimPLSymbol value = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
 		if(value.type == ValueType.VAR)
 		{
 			if(!env.GlobalExist((String)value.value)){
@@ -877,7 +892,9 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			}else
 				func = env.GlobalGetSymbol(func.value.toString());
 		}
-		
+		if(func.type == ValueType.FREE){
+			return new SimPLSymbol(ValueType.FREE);
+		}
 		if (func.type == ValueType.FUN) {
 			MyFunc f = (MyFunc) (func.value);
 			if(f.level == 0) {
