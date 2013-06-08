@@ -27,7 +27,15 @@ public class SimPLSymbol {
 		if(left.value == null || right.value == null){
 			return left.value == null && right.value == null;
 		}
-		return SameList(((ArrayList<SimPLSymbol>)left.value).get(0),((ArrayList<SimPLSymbol>)right.value).get(0));
+		ArrayList<SimPLSymbol> leftlist = ((ArrayList<SimPLSymbol>)left.value);
+		ArrayList<SimPLSymbol> rightlist = ((ArrayList<SimPLSymbol>)right.value);
+		if(leftlist.size()!=rightlist.size())
+			return false;
+		for(int i = 0; i != leftlist.size(); i++){
+			if(!Equal(leftlist.get(i),rightlist.get(i)))
+					return false;
+		}
+		return true;
 	}
 	public static boolean Equal(SimPLSymbol left, SimPLSymbol right){
 		if(left.type != right.type)

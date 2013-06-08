@@ -57,3 +57,65 @@ fun x -> fun y -> x:=y;x:=x+1 end end$
 2::(1::nil)
 
 let a = fun x -> if x > ~10 then (a x-1) else 0 end end in (a 100) end$
+
+
+
+
+let 
+	mod = 
+		fun x -> 
+			fun y -> x - x / y * y 
+			end 
+		end
+in 
+	let 
+		gcd = 
+			fun x -> 
+				fun y -> 
+					if (( mod x ) y) = 0 
+						then y 
+						else ((gcd y)((mod x) y)) 
+					end 
+				end 
+			end
+	in mod=gcd
+	end
+end
+$
+
+let flag = true in
+	let flagres = false in
+		let tmpint = 1 in
+			let tmphead = 1 in 
+				let inlist = 
+					fun list -> 
+						fun n ->
+							fun element ->
+								while(flag)
+								do
+									if(tmpint > n)
+									then 
+										flag := false
+									else 
+										tmpint := tmpint + 1;
+										tmphead := head list;
+										if tmphead = element
+										then
+											flag := false;
+											flagres := true
+										else ()
+										end;
+										list := tail list
+									end
+								end;
+								flagres
+							end
+						end
+					end
+					in
+						(((inlist 0::(1::(2::(3::nil)))) 4) 3)
+				end
+			end
+		end
+	end
+end$

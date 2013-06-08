@@ -385,6 +385,86 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		return first;
 	}
 
+	
+	private boolean SameList(SimPLSymbol left, SimPLSymbol right){
+		if((left.type == ValueType.LIST && right.type != ValueType.LIST)
+				||(left.type != ValueType.LIST && right.type == ValueType.LIST))
+			return false;
+		
+		if(right.type != left.type)
+			return false;
+		
+		if(left.type != ValueType.LIST)
+		{
+			return Equal(left,right);
+		}
+		if(left.value == null || right.value == null){
+			return left.value == null && right.value == null;
+		}
+		ArrayList<SimPLSymbol> leftlist = ((ArrayList<SimPLSymbol>)left.value);
+		ArrayList<SimPLSymbol> rightlist = ((ArrayList<SimPLSymbol>)right.value);
+		if(leftlist.size()!=rightlist.size())
+			return false;
+		for(int i = 0; i != leftlist.size(); i++){
+			if(!Equal(leftlist.get(i),rightlist.get(i)))
+					return false;
+		}
+		return true;
+	}
+	private boolean Equal(SimPLSymbol left, SimPLSymbol right){
+		if(left.type == ValueType.VAR)
+		{
+			if(!env.GlobalExist(left.value.toString())){
+				return false;
+			}else {
+				left =env.GlobalGetSymbol(left.value.toString());
+			}
+		}
+		if(left.type == ValueType.FREE){
+			return false;
+		}
+		if(right.type == ValueType.VAR)
+		{
+			if(!env.GlobalExist(right.value.toString())){
+				return false;
+			}else {
+				right =env.GlobalGetSymbol(right.value.toString());
+			}
+		}
+		if(right.type == ValueType.FREE){
+			return false;
+		}
+		if(left.type != right.type)
+			return false;
+		if(left.type == ValueType.INTEGER)
+			return Integer.parseInt(left.value.toString())== Integer.parseInt(right.value.toString());
+		if(left.type == ValueType.BOOLEAN)
+			return left.value.toString() == right.value.toString();
+		if(left.type == ValueType.LIST){
+			return SameList(left,right);
+		}
+		if(left.type == ValueType.UNIT)
+			return true;
+		if(left.type == ValueType.PAIR)
+			return Equal(((MyPair)left.value).first,((MyPair)right.value).first) 
+					&& Equal(((MyPair)left.value).second,((MyPair)right.value).second);
+		if(left.type == ValueType.FUN){
+			MyFunc leftFunc = (MyFunc)left.value;
+			MyFunc rightFunc = (MyFunc)right.value;
+			if(leftFunc.level != rightFunc.level)
+				return false;
+			if(leftFunc.level == 0)
+				return leftFunc.returnType == rightFunc.returnType && leftFunc.paramType == rightFunc.paramType;
+			else{
+				return Equal(leftFunc.body,rightFunc.body);
+			}
+		}
+		if(left.type == ValueType.UNDEF)
+			return false;
+		return true;
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see com.simPL.compiler.SIMPLVisitor#visit(com.simPL.compiler.ASTCompare, java.lang.Object)
 	 */
@@ -466,7 +546,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 					if(left.type != right.type)
 						return new SimPLSymbol(ValueType.EXCEPTION, "type in eq not match");
 					SimPLSymbol result = new SimPLSymbol(ValueType.BOOLEAN);
-					result.value = SimPLSymbol.Equal(left,right);
+					result.value = Equal(left,right);
 					return result;
 				}
 			}
@@ -889,8 +969,9 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		//System.out.println("in Application:"+num);
 		
 		SimPLSymbol param = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
-		
+		String paramName = "";
 		if(param.type == ValueType.VAR){
+			paramName = param.value.toString();
 			if(!env.GlobalExist((String)param.value)){
 				return new SimPLSymbol(ValueType.EXCEPTION, "var "+param.value+" is not defined");
 			}else
@@ -914,6 +995,10 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		}
 		if (func.type == ValueType.FUN) {
 			MyFunc f = (MyFunc) (func.value);
+			if(param.type == ValueType.FREE){
+				param = new SimPLSymbol(f.paramType);
+				env.GlobalSetSymbol(paramName, param);
+			}
 			if(f.level == 0) {
 				SimPLSymbol var = f.param;
 				env.EnterBlock();
@@ -949,7 +1034,9 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	public Object visit(ASTFunction node, Object data) {
 		// TODO Auto-generated method stub
 		//node.childrenAccept(this, data);
-		
+		SimPLSymbol result = new SimPLSymbol(ValueType.FUN);
+		ValueType paramType = ValueType.FREE;
+		ValueType returnType = ValueType.FREE;
 		SimPLSymbol param = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
 		env.EnterBlock();
 		env.LocalSetSymbol(param.value.toString(), new SimPLSymbol(ValueType.FREE));
@@ -959,6 +1046,16 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			envbak = env.Duplicate();
 		}
 		SimPLSymbol body = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+		paramType = env.GlobalGetSymbol(param.value.toString()).type;
+		
+		if(body.type == ValueType.VAR)
+		{
+			if(!env.GlobalExist((String)body.value)){
+				return new SimPLSymbol(ValueType.EXCEPTION, "var "+body.value.toString()+" is not defined");
+			}else
+				body = env.GlobalGetSymbol(body.value.toString());
+		}
+		returnType = body.type;
 		if(backedup){
 			env = envbak;
 			envbak = null;
@@ -968,8 +1065,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		int level = 0;
 		if(body.type == ValueType.FUN)
 			level = ((MyFunc)(body.value)).level+1;
-		SimPLSymbol result = new SimPLSymbol(ValueType.FUN);
-		result.value = new MyFunc(param,level,body,(SimpleNode)node.jjtGetChild(1));
+		
+		result.value = new MyFunc(param,level,body,(SimpleNode)node.jjtGetChild(1),paramType,returnType);
 		env.LeaveBlock();
 		return result;
 	}
