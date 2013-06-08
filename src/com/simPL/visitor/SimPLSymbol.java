@@ -1,5 +1,7 @@
 package com.simPL.visitor;
 
+import java.util.ArrayList;
+
 enum ValueType{
 	INTEGER,BOOLEAN,LIST,UNIT,PAIR,VAR,FUN,FREE,UNDEF,EXCEPTION
 }
@@ -9,6 +11,51 @@ public class SimPLSymbol {
 	public Object value;
 	
 	
+	public static boolean SameList(SimPLSymbol left, SimPLSymbol right){
+		
+		if((left.type == ValueType.LIST && right.type != ValueType.LIST)
+				||(left.type != ValueType.LIST && right.type == ValueType.LIST))
+			return false;
+		
+		if(right.type != left.type)
+			return false;
+		
+		if(left.type != ValueType.LIST)
+		{
+			return Equal(left,right);
+		}
+		if(left.value == null || right.value == null){
+			return left.value == null && right.value == null;
+		}
+		return SameList(((ArrayList<SimPLSymbol>)left.value).get(0),((ArrayList<SimPLSymbol>)right.value).get(0));
+	}
+	public static boolean Equal(SimPLSymbol left, SimPLSymbol right){
+		if(left.type != right.type)
+			return false;
+		if(left.type == ValueType.INTEGER)
+			return Integer.parseInt(left.value.toString())== Integer.parseInt(right.value.toString());
+		if(left.type == ValueType.BOOLEAN)
+			return left.value.toString() == right.value.toString();
+		if(left.type == ValueType.LIST){
+			return SameList(left,right);
+		}
+		if(left.type == ValueType.UNIT)
+			return true;
+		if(left.type == ValueType.PAIR)
+			return ((MyPair)left.value).first==((MyPair)right.value).first && ((MyPair)left.value).second==((MyPair)right.value).second;
+		if(left.type == ValueType.VAR)
+			return left.value.toString() == right.value.toString();
+		if(left.type == ValueType.FUN){
+			return ((MyFunc)left.value).level == ((MyFunc)right.value).level;
+		}
+		if(left.type == ValueType.FREE)
+			return true;
+		if(left.type == ValueType.UNDEF)
+			return true;
+		if(left.type == ValueType.EXCEPTION)
+			return true;
+		return true;
+	}
 	public void Print(){
 		if(type == ValueType.INTEGER)
 			System.out.println(value.toString());
@@ -51,8 +98,8 @@ public class SimPLSymbol {
 			value = null;
 	}
 	public SimPLSymbol(ValueType theType, Object theValue){
-		if(theType == ValueType.EXCEPTION)
-			System.err.println((String)theValue);
+		/*if(theType == ValueType.EXCEPTION)
+			System.err.println((String)theValue);*/
 		type = theType;
 		value = theValue;
 	}

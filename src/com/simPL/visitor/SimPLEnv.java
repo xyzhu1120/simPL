@@ -23,7 +23,18 @@ public class SimPLEnv implements SIMPLTreeConstants, SIMPLConstants{
 	}
 	public SimPLEnv Duplicate(){
 		SimPLEnv result = new SimPLEnv();
-		result.stack = new Vector<HashMap<String, SimPLSymbol>>(stack); 
+		for(int i = 0; i < stack.size();i++){
+			HashMap<String, SimPLSymbol> frame = new HashMap<String, SimPLSymbol>();
+			result.stack.add(frame);
+			
+			Iterator<String> itKey = stack.get(i).keySet().iterator();
+			Iterator<SimPLSymbol> itValue = stack.get(i).values().iterator();
+			while(itKey.hasNext()){
+				String name = itKey.next();
+				SimPLSymbol value = itValue.next();
+				frame.put(name, value);
+			}
+		}
 		return result;
 	}
 	public int EnterBlock(){

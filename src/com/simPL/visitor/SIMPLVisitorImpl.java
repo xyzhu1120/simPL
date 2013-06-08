@@ -38,7 +38,7 @@ import java.util.List;
 public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	
 	public SimPLEnv env = new SimPLEnv();
-
+	public SimPLEnv envbak = null;
 	/* (non-Javadoc)
 	 * @see com.simPL.compiler.SIMPLVisitor#visit(com.simPL.compiler.SimpleNode, java.lang.Object)
 	 */
@@ -397,6 +397,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		Object first = node.jjtGetChild(0).jjtAccept(this, data);
 		try {
 			if(num > 1){
+				String op = ((SimpleNode)(node.jjtGetChild(0))).jjtGetLastToken().next.image;
 				SimPLSymbol left = (SimPLSymbol)first;
 				String leftName = "";
 				if(left.type == ValueType.VAR)
@@ -411,14 +412,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				}
 				if(left.type == ValueType.UNDEF)
 					return new SimPLSymbol(ValueType.UNDEF);
-				if(left.type == ValueType.FREE){
-					left = new SimPLSymbol(ValueType.INTEGER);
-					env.GlobalSetSymbol(leftName, left);
-				}
-				if(left.type != ValueType.INTEGER)
-				{
-					return new SimPLSymbol(ValueType.EXCEPTION,"left in compare need int");
-				}
+				
+				
 				SimPLSymbol right = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
 				String rightName="";
 				if(right.type == ValueType.VAR)
@@ -433,23 +428,45 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				}
 				if(right.type == ValueType.UNDEF)
 					return new SimPLSymbol(ValueType.UNDEF);
-				if(right.type == ValueType.FREE){
-					right = new SimPLSymbol(ValueType.INTEGER);
-					env.GlobalSetSymbol(rightName, right);
-				}
-				if(right.type != ValueType.INTEGER){
-					return new SimPLSymbol(ValueType.EXCEPTION,"right in compare need int");
-				}else{
+				if(op != "=") {
+					if(left.type == ValueType.FREE){
+						left = new SimPLSymbol(ValueType.INTEGER);
+						env.GlobalSetSymbol(leftName, left);
+					}
+					if(right.type == ValueType.FREE){
+						right = new SimPLSymbol(ValueType.INTEGER);
+						env.GlobalSetSymbol(rightName, right);
+					}
+					if(left.type != ValueType.INTEGER)
+					{
+						return new SimPLSymbol(ValueType.EXCEPTION,"left in compare need int");
+					}
+					if(right.type != ValueType.INTEGER){
+						return new SimPLSymbol(ValueType.EXCEPTION,"right in compare need int");
+					}
 					int lv = Integer.parseInt(left.value.toString());
 					int rv = Integer.parseInt(right.value.toString());
-					String op = ((SimpleNode)(node.jjtGetChild(0))).jjtGetLastToken().next.image;
 					SimPLSymbol result = new SimPLSymbol(ValueType.BOOLEAN);
-					if(op=="=")
-						result.value = lv == rv?"true":"false";
-					else if(op==">")
+					if(op==">")
 						result.value = lv > rv?"true":"false";
 					else if(op=="<")
 						result.value = lv < rv?"true":"false";
+					return result;
+				}else{
+					if(left.type == ValueType.FREE && right.type == ValueType.FREE){
+						return new SimPLSymbol(ValueType.BOOLEAN);
+					}
+					if(left.type == ValueType.FREE){
+						left = new SimPLSymbol(right.type,right.value);
+						env.GlobalSetSymbol(leftName, left);
+					}else if (right.type == ValueType.FREE){
+						right = new SimPLSymbol(left.type,left.value);
+						env.GlobalSetSymbol(rightName,right);
+					}
+					if(left.type != right.type)
+						return new SimPLSymbol(ValueType.EXCEPTION, "type in eq not match");
+					SimPLSymbol result = new SimPLSymbol(ValueType.BOOLEAN);
+					result.value = SimPLSymbol.Equal(left,right);
 					return result;
 				}
 			}
@@ -936,9 +953,18 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		SimPLSymbol param = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
 		env.EnterBlock();
 		env.LocalSetSymbol(param.value.toString(), new SimPLSymbol(ValueType.FREE));
-		SimPLEnv envbak = env.Duplicate();
+		boolean backedup = false;
+		if(envbak == null) {
+			backedup = true;
+			envbak = env.Duplicate();
+		}
 		SimPLSymbol body = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
-		env = envbak;
+		if(backedup){
+			env = envbak;
+			envbak = null;
+		}
+		
+		
 		int level = 0;
 		if(body.type == ValueType.FUN)
 			level = ((MyFunc)(body.value)).level+1;
