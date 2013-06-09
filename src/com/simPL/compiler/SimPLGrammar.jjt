@@ -77,7 +77,8 @@ TOKEN : /*punctuation characters*/
 | < TILDE : "~" >
 | < SEMICOLON : ";" >
 }
-TOKEN : /* LITERALS */{  < INTEGER_LITERAL :    < DECIMAL_LITERAL > ([ "l", "L" ])?  | < HEX_LITERAL > ([ "l", "L" ])?  | < OCTAL_LITERAL > ([ "l", "L" ])?     >| < #DECIMAL_LITERAL : [ "1"-"9" ] ([ "0"-"9" ])* >| < #HEX_LITERAL : "0" [ "x", "X" ] ([ "0"-"9", "a"-"f", "A"-"F" ])+ >| < #OCTAL_LITERAL : "0" ([ "0"-"7" ])* >}TOKEN : /* IDENTIFIERS */{  < IDENTIFIER :    < LETTER >    (      < LETTER >    | < DIGIT >    )* >| < #LETTER : [ "_", "a"-"z", "A"-"Z" ] >| < #DIGIT : [ "0"-"9" ] >}SimpleNode Start() #START:{}{  Expression() "$"  {    return jjtThis;  }}
+TOKEN : /* LITERALS */{  < INTEGER_LITERAL :    ("-")? < DECIMAL_LITERAL >
+    //([ "l", "L" ])?//  | < HEX_LITERAL > ([ "l", "L" ])?//  | < OCTAL_LITERAL > ([ "l", "L" ])?     >| < #DECIMAL_LITERAL : [ "1"-"9" ] ([ "0"-"9" ])* >//| < #HEX_LITERAL : "0" [ "x", "X" ] ([ "0"-"9", "a"-"f", "A"-"F" ])+ >//| < #OCTAL_LITERAL : "0" ([ "0"-"7" ])* >}TOKEN : /* IDENTIFIERS */{  < IDENTIFIER :    < LETTER >    (      < LETTER >    | < DIGIT >    )* >| < #LETTER : [ "_", "a"-"z", "A"-"Z" ] >| < #DIGIT : [ "0"-"9" ] >}SimpleNode Start() #START:{}{  Expression() "$"  {    return jjtThis;  }}
 void Expression() #Expression: 
 {}
 {  (    AssignExp()
