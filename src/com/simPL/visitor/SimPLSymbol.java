@@ -72,8 +72,10 @@ public class SimPLSymbol {
 			System.out.println(value.toString());
 		if(type == ValueType.LIST) {
 			System.out.println("list");
-			if(value == null)
+			if(value == null) {
 				System.out.println("the list is nil");
+				return;
+			}
 			List<SimPLSymbol> list = (List<SimPLSymbol>)value;
 			for(int i =0; i < list.size();i++)
 				list.get(i).Print();
