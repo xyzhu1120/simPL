@@ -64,7 +64,7 @@ public class SimPLEnv implements SIMPLTreeConstants, SIMPLConstants{
 	}
 	
 	public int LocalSetSymbol(String name, SimPLSymbol symbol){
-		SimPLSymbol value = new SimPLSymbol(symbol.type,symbol.value);
+		SimPLSymbol value = symbol.Duplicate();
 		curenv = stack.get(stack.size()-1);
 		if(curenv.containsKey(name)){
 			curenv.put(name, value);

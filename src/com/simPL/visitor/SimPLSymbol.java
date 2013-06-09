@@ -114,6 +114,31 @@ public class SimPLSymbol {
 		if(type == ValueType.LIST)
 			value = null;
 	}
+	public SimPLSymbol Duplicate(){
+		SimPLSymbol result = new SimPLSymbol(type, value);
+		if(type == ValueType.FUN){
+			MyFunc origin = (MyFunc)value;
+			MyFunc tmp = new MyFunc(origin.param.Duplicate(), origin.level, origin.body.Duplicate(), origin.node, origin.paramType, origin.paramType);
+			result.value = tmp;
+		}else if(type == ValueType.LIST)
+		{
+			if(value == null)
+				return result;
+			
+			List<SimPLSymbol> origin = (List<SimPLSymbol>)value;
+			List<SimPLSymbol> newlist = new ArrayList<SimPLSymbol>();
+			for(int i = 0; i < origin.size(); i++){
+				newlist.add(origin.get(i).Duplicate());
+			}
+			result.value = newlist;
+		}else if(type == ValueType.PAIR)
+		{
+			MyPair origin = (MyPair)value;
+			MyPair newpair = new MyPair(origin.first.Duplicate(),origin.second.Duplicate());
+			result.value = newpair;
+		}
+		return result;
+	}
 	public SimPLSymbol(ValueType theType, Object theValue){
 		if(theType == ValueType.EXCEPTION)
 			System.err.println((String)theValue);
