@@ -833,7 +833,9 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		// TODO Auto-generated method stub
 		SimPLSymbol cond = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
 		String var = "";
-		
+		if(cond.type == ValueType.EXCEPTION){
+			return cond;
+		}
 		/*SimPLEnv envbak = env.Duplicate();
 		SimPLSymbol thenValue = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
 		var ="";
@@ -922,7 +924,9 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			}
 			
 			if(cond.value.toString() == "true"){
-				node.jjtGetChild(1).jjtAccept(this, data);
+				SimPLSymbol result = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+				if(result.type == ValueType.EXCEPTION)
+					return result;
 			}else {
 				break;
 			}
@@ -992,7 +996,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		{
 			System.out.println("nests should be "+depth);
 		}
-		
+		if(func.type == ValueType.EXCEPTION)
+			return new SimPLSymbol(ValueType.EXCEPTION,"error in first application");
 		if(func.type == ValueType.VAR){
 			if(!env.GlobalExist((String)func.value)){
 				return new SimPLSymbol(ValueType.EXCEPTION, "var "+func.value+" is not defined");
