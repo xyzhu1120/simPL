@@ -544,7 +544,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 						env.GlobalSetSymbol(rightName,right);
 					}
 					if(left.type != right.type)
-						return new SimPLSymbol(ValueType.EXCEPTION, "type in eq not match");
+						return new SimPLSymbol(ValueType.EXCEPTION, "type in eq not match" + node.jjtGetFirstToken().beginLine);
 					SimPLSymbol result = new SimPLSymbol(ValueType.BOOLEAN);
 					result.value = Equal(left,right);
 					return result;

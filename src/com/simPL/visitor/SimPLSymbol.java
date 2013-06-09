@@ -1,6 +1,7 @@
 package com.simPL.visitor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 enum ValueType{
 	INTEGER,BOOLEAN,LIST,UNIT,PAIR,VAR,FUN,FREE,UNDEF,EXCEPTION
@@ -69,8 +70,14 @@ public class SimPLSymbol {
 			System.out.println(value.toString());
 		if(type == ValueType.BOOLEAN)
 			System.out.println(value.toString());
-		if(type == ValueType.LIST)
+		if(type == ValueType.LIST) {
 			System.out.println("list");
+			if(value == null)
+				System.out.println("the list is nil");
+			List<SimPLSymbol> list = (List<SimPLSymbol>)value;
+			for(int i =0; i < list.size();i++)
+				list.get(i).Print();
+		}
 		if(type == ValueType.UNIT)
 			System.out.println("unit");
 		if(type == ValueType.PAIR){
@@ -112,12 +119,5 @@ public class SimPLSymbol {
 		value = theValue;
 	}
 	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-	}
 
 }
