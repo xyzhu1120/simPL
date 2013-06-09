@@ -710,7 +710,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			}
 			if(value.type != ValueType.BOOLEAN)
 				return new SimPLSymbol(ValueType.EXCEPTION, "not op should be followed by a boolean"); 
-			value.value = value.value=="true"?"false":"true";
+			value.value = value.value.toString()=="true"?"false":"true";
+			
 			return value;
 		}else if(op == "~"){
 			String var="";
@@ -767,8 +768,10 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			if(value.type != ValueType.LIST)
 				return new SimPLSymbol(ValueType.EXCEPTION, "head/tail should be followed by a list");
 			List<SimPLSymbol> list = (List<SimPLSymbol>)value.value;
-			if(list == null)
-				return new SimPLSymbol(ValueType.EXCEPTION, "head/tail on a nil");
+			if(list == null) {
+				return value;
+			//	return new SimPLSymbol(ValueType.EXCEPTION, "head/tail on a nil");
+			}
 			if(op == "head"){
 				return list.get(0);
 			}else{
@@ -915,7 +918,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			
 			if(cond.type != ValueType.BOOLEAN)
 			{
-				return new SimPLSymbol(ValueType.EXCEPTION,"if condition should be boolean");
+				return new SimPLSymbol(ValueType.EXCEPTION,"while condition should be boolean");
 			}
 			
 			if(cond.value.toString() == "true"){
