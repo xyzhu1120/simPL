@@ -805,13 +805,19 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			if(!env.GlobalExist((String)value.value)){
 				return new SimPLSymbol(ValueType.EXCEPTION, "var "+value.value+" is not defined");
 			}
-			
 			env.LocalSetSymbol((String)var.value, env.GlobalGetSymbol((String)value.value));
 		}
 		else {
 			env.LocalSetSymbol((String)var.value, value);
 		}
 		SimPLSymbol body = (SimPLSymbol)node.jjtGetChild(2).jjtAccept(this, data);
+		if(body.type == ValueType.VAR)
+		{
+			if(!env.GlobalExist((String)body.value)){
+				return new SimPLSymbol(ValueType.EXCEPTION, "var "+body.value+" is not defined");
+			}
+			body = env.GlobalGetSymbol((String)body.value);
+		}
 		env.LeaveBlock();
 		return body;
 	}
