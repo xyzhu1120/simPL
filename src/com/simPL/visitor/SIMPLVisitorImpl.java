@@ -776,7 +776,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				return list.get(0);
 			}else{
 				list.remove(0);
-				
+				if(list.size()==0)
+					value.value = null;
 				return value;
 			}
 		}
