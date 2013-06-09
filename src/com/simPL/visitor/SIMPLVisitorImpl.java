@@ -730,7 +730,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				return new SimPLSymbol(ValueType.UNDEF);
 			if(value.type != ValueType.INTEGER)
 				return new SimPLSymbol(ValueType.EXCEPTION, "~ op should be followed by a int"); 
-			value.value = Integer.toString(~Integer.parseInt(value.value.toString()));
+			value.value = Integer.toString(-1*Integer.parseInt(value.value.toString()));
 			return value;
 		}else if(op == "fst" || op == "snd"){
 			String var="";
