@@ -79,7 +79,9 @@ public class SimPL {
 		    catch (Exception e)
 		    {
 		      System.out.println("ERROR:");
-		      System.out.println(e.getMessage());
+		      String errormsg = e.getMessage();
+		      String tmp = errormsg.substring(0, errormsg.indexOf('\n'));
+		      System.out.println(tmp);
 		    }
 		    catch (Error e)
 		    {
