@@ -400,8 +400,21 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			MyFunc rightFunc = (MyFunc)right.value;
 			if(leftFunc.level != rightFunc.level)
 				return false;
-			if(leftFunc.level == 0)
-				return leftFunc.returnType == rightFunc.returnType && leftFunc.paramType == rightFunc.paramType;
+			if(leftFunc.level == 0) {
+				boolean returneq = true;
+				boolean parameq = true;
+				if(leftFunc.returnType == ValueType.FREE || rightFunc.returnType == ValueType.FREE){
+					
+				}else{
+					returneq = leftFunc.returnType == rightFunc.returnType;
+				}
+				if(leftFunc.paramType == ValueType.FREE || rightFunc.paramType == ValueType.FREE){
+					
+				}else{
+					parameq = leftFunc.paramType == rightFunc.paramType;
+				}
+				return  parameq&&returneq;
+			}
 			else{
 				return Equal(leftFunc.body,rightFunc.body);
 			}
@@ -452,7 +465,21 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			if(leftFunc.level != rightFunc.level)
 				return false;
 			if(leftFunc.level == 0)
-				return leftFunc.returnType == rightFunc.returnType && leftFunc.paramType == rightFunc.paramType;
+			{
+				boolean returneq = true;
+				boolean parameq = true;
+				if(leftFunc.returnType == ValueType.FREE || rightFunc.returnType == ValueType.FREE){
+					
+				}else{
+					returneq = leftFunc.returnType == rightFunc.returnType;
+				}
+				if(leftFunc.paramType == ValueType.FREE || rightFunc.paramType == ValueType.FREE){
+					
+				}else{
+					parameq = leftFunc.paramType == rightFunc.paramType;
+				}
+				return  parameq&&returneq;
+			}
 			else{
 				return Equal(leftFunc.body,rightFunc.body);
 			}
