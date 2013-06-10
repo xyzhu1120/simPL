@@ -1,0 +1,689 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>report</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+/* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
+/* Author: Nicolas Hery - http://nicolashery.com */
+/* Version: 29d1c5bc36da364ad5aa86946d420b7bbc54a253 */
+/* Source: https://github.com/nicolahery/markdownpad-github */
+
+/* RESET
+=============================================================================*/
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* BODY
+=============================================================================*/
+
+body {
+  font-family: Helvetica, arial, freesans, clean, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  background-color: #fff;
+  padding: 20px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+body>*:first-child {
+  margin-top: 0 !important;
+}
+
+body>*:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* BLOCKS
+=============================================================================*/
+
+p, blockquote, ul, ol, dl, table, pre {
+  margin: 15px 0;
+}
+
+/* HEADERS
+=============================================================================*/
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 20px 0 10px;
+  padding: 0;
+  font-weight: bold;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 tt, h1 code, h2 tt, h2 code, h3 tt, h3 code, h4 tt, h4 code, h5 tt, h5 code, h6 tt, h6 code {
+  font-size: inherit;
+}
+
+h1 {
+  font-size: 28px;
+  color: #000;
+}
+
+h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #ccc;
+  color: #000;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+h4 {
+  font-size: 16px;
+}
+
+h5 {
+  font-size: 14px;
+}
+
+h6 {
+  color: #777;
+  font-size: 14px;
+}
+
+body>h2:first-child, body>h1:first-child, body>h1:first-child+h2, body>h3:first-child, body>h4:first-child, body>h5:first-child, body>h6:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4, a:first-child h5, a:first-child h6 {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+h1+p, h2+p, h3+p, h4+p, h5+p, h6+p {
+  margin-top: 10px;
+}
+
+/* LINKS
+=============================================================================*/
+
+a {
+  color: #4183C4;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* LISTS
+=============================================================================*/
+
+ul, ol {
+  padding-left: 30px;
+}
+
+ul li > :first-child, 
+ol li > :first-child, 
+ul li ul:first-of-type, 
+ol li ol:first-of-type, 
+ul li ol:first-of-type, 
+ol li ul:first-of-type {
+  margin-top: 0px;
+}
+
+ul ul, ul ol, ol ol, ol ul {
+  margin-bottom: 0;
+}
+
+dl {
+  padding: 0;
+}
+
+dl dt {
+  font-size: 14px;
+  font-weight: bold;
+  font-style: italic;
+  padding: 0;
+  margin: 15px 0 5px;
+}
+
+dl dt:first-child {
+  padding: 0;
+}
+
+dl dt>:first-child {
+  margin-top: 0px;
+}
+
+dl dt>:last-child {
+  margin-bottom: 0px;
+}
+
+dl dd {
+  margin: 0 0 15px;
+  padding: 0 15px;
+}
+
+dl dd>:first-child {
+  margin-top: 0px;
+}
+
+dl dd>:last-child {
+  margin-bottom: 0px;
+}
+
+/* CODE
+=============================================================================*/
+
+pre, code, tt {
+  font-size: 12px;
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
+}
+
+code, tt {
+  margin: 0 0px;
+  padding: 0px 0px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px;
+}
+
+pre>code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent;
+}
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px;
+}
+
+pre code, pre tt {
+  background-color: transparent;
+  border: none;
+}
+
+/* QUOTES
+=============================================================================*/
+
+blockquote {
+  border-left: 4px solid #DDD;
+  padding: 0 15px;
+  color: #777;
+}
+
+blockquote>:first-child {
+  margin-top: 0px;
+}
+
+blockquote>:last-child {
+  margin-bottom: 0px;
+}
+
+/* HORIZONTAL RULES
+=============================================================================*/
+
+hr {
+  clear: both;
+  margin: 15px 0;
+  height: 0px;
+  overflow: hidden;
+  border: none;
+  background: transparent;
+  border-bottom: 4px solid #ddd;
+  padding: 0;
+}
+
+/* TABLES
+=============================================================================*/
+
+table th {
+  font-weight: bold;
+}
+
+table th, table td {
+  border: 1px solid #ccc;
+  padding: 6px 13px;
+}
+
+table tr {
+  border-top: 1px solid #ccc;
+  background-color: #fff;
+}
+
+table tr:nth-child(2n) {
+  background-color: #f8f8f8;
+}
+
+/* IMAGES
+=============================================================================*/
+
+img {
+  max-width: 100%
+}
+</style>
+</head>
+<body>
+<h1>SimPL Interpreter Design Report</h1>
+<hr />
+<p><strong>1120379021</strong>
+<strong>Haiyang Sun</strong>(孙海洋)</p>
+<p><strong>1120379029</strong>
+<strong>Xinyu Zhu</strong>(朱新宇)</p>
+<hr />
+<h2>Introduction</h2>
+<p>We have implemented <strong>SimPL</strong>, an extension of the lambda calculus which is the basis of functional programming but
+includes some features imperative programming as well according to the specification V3.0. We use <strong>javacc</strong> as the basic tool to build the syntax tree, and apply the <strong>visitor</strong> design pattern to traverse through the whole parse tree. </p>
+<p>Finally, we have achieved the target for the interpreter to correctly deal with the lexical analysis, syntax analysis, semantic analysis and issues like priorities, type inference, static scoping following the typing rule as well as the semantics rule. </p>
+<h2>Detail</h2>
+<p>We will cover only the key implementation details in this chapter. The whole implementation can be got referring to the code packaged as appendix.</p>
+<pre><code>visitor/
+├── MyFunc.java             //A representation for a Function type 
+├── MyPair.java             //A representation for a Pair type
+├── SimPLEnv.java           //A representation for the stack frame info
+├── SimPL.java              //The main process dealing with console input
+├── SimPLSymbol.java        //The symbol can include all symbol types used in SimPL
+└── SIMPLVisitorImpl.java   //The visitor we use for traversing the parse tree
+
+compiler/
+├── SimPLGrammar.jjt
+└── ....java
+</code></pre>
+
+<h3>Main Helper Classes</h3>
+<h5>1. SimPLSymbol</h5>
+<p>This class is used to represent different values in SimPL. It is also used as return value for visit and value for symbol table.</p>
+<pre><code>public class SimPLSymbol {
+    public ValueType type;
+    public Object value;
+    public static boolean SameList(SimPLSymbol left, SimPLSymbol right){
+    public static boolean Equal(SimPLSymbol left, SimPLSymbol right){
+    public void Print(){
+    public SimPLSymbol(ValueType theType){
+    public SimPLSymbol(ValueType theType, Object theValue){
+</code></pre>
+
+<p>Where ValueType is the enumerate as:</p>
+<pre><code>enum ValueType{
+    INTEGER,BOOLEAN,LIST,UNIT,PAIR,VAR,FUN,FREE,UNDEF,EXCEPTION
+}
+</code></pre>
+
+<p>The object <strong>value</strong> field is a java type corresponding to the type:</p>
+<pre><code>INTEGER -&gt;  String
+BOOLEAN -&gt;  String
+LIST    -&gt;  List&lt;SimPLSymbol&gt;
+UNIT    -&gt;  null
+PAIR    -&gt;  MyPair
+VAR     -&gt;  String
+FUN     -&gt;  MyFunc
+FREE    -&gt;  null    
+UNDEF   -&gt;  null
+EXCEP   -&gt;  String  
+</code></pre>
+
+<h5>2.MyPair &amp;&amp; MyFunc</h5>
+<pre><code>public class MyPair {
+    public SimPLSymbol first;
+    public SimPLSymbol second;
+}
+public class MyFunc {
+    public SimPLSymbol param;   //var whose value is the name of the param
+    public int level;           //nested level, the argument needed is (level+1)
+    public SimPLSymbol body;    //the body can be another FUN type SimPLSymbol
+    public SimpleNode node;     //the node for the body which used for application usage
+    public ValueType paramType; //stored for type checking
+    public ValueType returnType;//stored for type checking
+}
+</code></pre>
+
+<h5>3.SimPLEnv</h5>
+<p>This class is used for the static scoping. </p>
+<pre><code>public class SimPLEnv implements SIMPLTreeConstants, SIMPLConstants{
+    private Vector&lt;HashMap&lt;String, SimPLSymbol&gt;&gt; stack = null;
+    public SimPLEnv(){
+    public SimPLEnv Duplicate(){
+    public int EnterBlock(){
+    public int LeaveBlock(){
+    public int GetDepth(){
+    public int PopStackToDepth(int depth){
+    public boolean LocalExist(String name){
+    public int LocalSetSymbol(String name, SimPLSymbol symbol){
+    public boolean GlobalExist(String name){
+    public SimPLSymbol GlobalGetSymbol(String name){
+    public int GlobalSetSymbol(String name, SimPLSymbol newValue){
+    public void PrintStack(){
+</code></pre>
+
+<p>This class uses a Vector of HashMap&lt;String, SimPLSymbol&gt; to record the frame stack. EnterBlock() stands for pushing a new empty frame onto the stack while LeaveBlock represents for quitting from a block.</p>
+<h4>4. Visitor</h4>
+<p>Every variable must be declared before it can get used. So we can do the type checking and type inference along with the execution of real expression. We use a single visitor, which traverse the parse tree in DFS. We can evaluation each node of the tree using post-order traversing. Take the ASTWhile node for example:</p>
+<pre><code>public Object visit(ASTWhile node, Object data) {
+    while(true){
+        SimPLSymbol cond = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
+        String var = &quot;&quot;;
+        if(cond.type == ValueType.VAR)
+        {
+            var = cond.value.toString();
+            if(!env.GlobalExist((String)cond.value)){
+                return new SimPLSymbol(ValueType.EXCEPTION, &quot;var &quot;+cond.value+&quot; is not defined&quot;);
+            }
+            cond = env.GlobalGetSymbol((String)cond.value);
+        }
+        if(cond.type == ValueType.FREE)
+        {
+            cond = new SimPLSymbol(ValueType.BOOLEAN,&quot;true&quot;);
+            env.GlobalSetSymbol(var, cond);
+        }
+
+        if(cond.type != ValueType.BOOLEAN)
+        {
+            return new SimPLSymbol(ValueType.EXCEPTION,&quot;if condition should be boolean&quot;);
+        }
+
+        if(cond.value.toString() == &quot;true&quot;){
+            node.jjtGetChild(1).jjtAccept(this, data);
+        }else {
+            break;
+        }
+    }
+    return new SimPLSymbol(ValueType.UNIT);
+}
+</code></pre>
+
+<p>In this case, we can find that each node in the parse tree can get the value it needs through return value of its children. When child returns a variable type Symbol, the parent should lookup the symbol table &quot;env&quot; for the corresponding value before it can use the symbol as the right value. Here the <em>WhileNode</em> first check the condition, the condition should be a boolean or a exception will be returned to upper node. If the condition is not met, return a UNIT value or execute the while body. </p>
+<p>Here free type stands for the variable which is not already defined. 2 possible cases for this are:</p>
+<ol>
+<li>
+<p>In function, the param used in the function body depends on the input, so the type is free;</p>
+</li>
+<li>
+<p>In recursive definition of variable， including the definition of recursive function.</p>
+</li>
+</ol>
+<p>The overall interfaces are:</p>
+<pre><code>public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
+    public SimPLEnv env = new SimPLEnv();
+    public SimPLEnv envbak = null;
+    public Object visit(SimpleNode node, Object data) {
+    public Object visit(ASTSTART node, Object data) {
+    public Object visit(ASTAssignment node, Object data) {
+    public Object visit(ASTList node, Object data) {
+    public Object visit(ASTAndOr node, Object data) {
+    public Object visit(ASTCompare node, Object data) {
+    public Object visit(ASTAddMinus node, Object data) {
+    public Object visit(ASTMulDiv node, Object data) {
+    public Object visit(ASTUnaryExp node, Object data) {
+    public Object visit(ASTLet node, Object data) {
+    public Object visit(ASTCond node, Object data) {
+    public Object visit(ASTWhile node, Object data) {
+    public Object visit(ASTBracket node, Object data) {
+    public Object visit(ASTPair node, Object data) {
+    public Object visit(ASTApplication node, Object data) {
+    public Object visit(ASTFunction node, Object data) {
+    public Object visit(ASTVar node, Object data) {
+    public Object visit(ASTInt node, Object data) {
+    public Object visit(ASTBool node, Object data) {
+    public Object visit(ASTExpression node, Object data) {
+    public Object visit(ASTNil node, Object data) {
+    public Object visit(ASTUnit node, Object data) {
+</code></pre>
+
+<h4>5. Challenges in design</h4>
+<p>There are several difficulties during the progress:</p>
+<ol>
+<li>Type inference</li>
+<li>Function type</li>
+<li>Application</li>
+<li>Recursion</li>
+</ol>
+<h5>Type Inference</h5>
+<p>Type inference takes place when a variable's type is not clear and we use this variable.
+We allocate the <em>FREE</em> type for a variable whose value type is not clear.
+And we follow the basic type inference rule that infers the variable in execution: In addition, a free variable must be a integer and in logic
+operation, it must be a boolean and so on.</p>
+<p>We only apply type inference to the variable whose value will be used as least once in real execution. This strategy is enough, because the dynamic checking will make up for some special cases.</p>
+<p>We use some examples to illustrate some inference cases:</p>
+<pre><code>Reading from standard input...
+let i = 1 in 
+    let f = fun x -&gt; fun y -&gt; head (x::((y+1)::nil))    in
+        ((f true) 2)
+    end
+end$
+
+**OUTPUT**
+parameter type does not match for function f
+**END**
+</code></pre>
+
+<p>Here, we infer from y+1 that y must be an integer. So (y+1)::nil must be a list of integer.
+So x must be an integer type. So application with true will incur a type error before do the real application.</p>
+<p>We give more examples in Chapter Test</p>
+<h5>Function type using pre-run</h5>
+<p>The function node is a special node, because when traversing of the visitor, the parameter is not known until an application happens.
+So the function body cannot be directly evaluated.
+The function body can be another function which makes the process more complex.</p>
+<p>To solve the problem, we insert a new symbol, whose name is the parameter into the local environment symbol table(env) of type FREE. Then we can evaluate the body node accepting the visitor. </p>
+<p>This pre-run is used to get the return type as well as the parameter type, and also used to do type inference for some variables in its body.   </p>
+<p>To avoid this process from destroying the real environment(the symbol table), we first get the real env backed up, after the body returns, we recover the env with the original one.</p>
+<pre><code>envbak = env.Duplicate();
+</code></pre>
+
+<p>Here is the code: </p>
+<pre><code>@Override
+public Object visit(ASTFunction node, Object data) {
+    SimPLSymbol result = new SimPLSymbol(ValueType.FUN);
+    ValueType paramType = ValueType.FREE;
+    ValueType returnType = ValueType.FREE;
+    SimPLSymbol param = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
+    env.EnterBlock();
+    env.LocalSetSymbol(param.value.toString(), new SimPLSymbol(ValueType.FREE));
+    boolean backedup = false;
+    if(envbak == null) {
+        backedup = true;
+        envbak = env.Duplicate();
+    }
+    SimPLSymbol body = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+    paramType = env.GlobalGetSymbol(param.value.toString()).type;
+
+    if(body.type == ValueType.VAR)
+    {
+        if(!env.GlobalExist((String)body.value)){
+            return new SimPLSymbol(ValueType.EXCEPTION, &quot;...&quot;);
+        }else
+            body = env.GlobalGetSymbol(body.value.toString());
+    }
+    returnType = body.type;
+    if(backedup){
+        env = envbak;
+        envbak = null;
+    }
+    int level = 0;
+    if(body.type == ValueType.FUN)
+        level = ((MyFunc)(body.value)).level+1;
+    result.value = new MyFunc(param,level,body,
+        (SimpleNode)node.jjtGetChild(1),paramType,returnType);
+    env.LeaveBlock();
+    return result;
+}
+</code></pre>
+
+<p>With the code above, we can get the param type as well as the return type.
+We also add the body node into the result, which will be used in application to this function. </p>
+<h5>Application</h5>
+<p>The key idea in dealing with multiple parameters in an application is taking advantage of the Function Symbol returned. From above, you know that our FunctionNode will return with the level information as well as the return and parameter type. If the returned FunctionNode is a level 0 function, we know it's in the out most application and we can evaluate in its body.
+Before that, we just push the parameter of each level into the stack.</p>
+<p>The code is as below:</p>
+<pre><code>@Override
+public Object visit(ASTApplication node, Object data) {
+    int num = node.jjtGetNumChildren();
+    SimPLSymbol param = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+    if(param.type == ValueType.EXCEPTION)
+        return param;
+    String paramName = &quot;&quot;;
+    if(param.type == ValueType.VAR){
+        paramName = param.value.toString();
+        if(!env.GlobalExist((String)param.value)){
+            return new SimPLSymbol(ValueType.EXCEPTION, &quot;var &quot;+param.value+&quot; is not defined&quot;);
+        }else
+            param = env.GlobalGetSymbol(param.value.toString());
+    }
+    int depth = env.GetDepth();
+    env.EnterBlock();
+    SimPLSymbol func = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
+    if(func.type == ValueType.EXCEPTION)
+        return func;
+    if(func.type == ValueType.VAR){
+        if(!env.GlobalExist((String)func.value)){
+            return new SimPLSymbol(ValueType.EXCEPTION, &quot;var &quot;+func.value+&quot; is not defined&quot;);
+        }else
+            func = env.GlobalGetSymbol(func.value.toString());
+    }
+    if(func.type == ValueType.FREE){
+        env.LeaveBlock();
+        return new SimPLSymbol(ValueType.FREE);
+    }
+    if (func.type == ValueType.FUN) {
+        MyFunc f = (MyFunc) (func.value);
+        if(param.type == ValueType.FREE){
+            param = new SimPLSymbol(f.paramType);
+            env.GlobalSetSymbol(paramName, param);
+        }
+        if(f.level == 0) {
+            SimPLSymbol var = f.param;
+            env.LocalSetSymbol(var.value.toString(), param);
+            SimPLSymbol exp = (SimPLSymbol)f.node.jjtAccept(this, data);
+            if(((SimPLSymbol)exp).type == ValueType.EXCEPTION){
+                env.LeaveBlock();
+                return exp;
+            }
+            if(exp.type == ValueType.VAR){
+                exp = env.GlobalGetSymbol(exp.value.toString());
+            }
+            env.LeaveBlock();
+            int nests = env.PopStackToDepth(depth);
+            return exp;
+        }else {
+            SimPLSymbol var = f.param;
+            if(f.param.value.toString() == &quot;q&quot;)
+            {
+                System.out.println(&quot;use q&quot;);
+            }
+            env.LocalSetSymbol(var.value.toString(), param);
+            return f.body;
+        }
+
+    }else {
+        return new SimPLSymbol(ValueType.EXCEPTION,&quot;application need fun type&quot;);
+    }
+}
+</code></pre>
+
+<h5>Recursion</h5>
+<p>In a let expression, the variable being defined may be used in the &quot;in&quot; body, including defining  a recursive function. </p>
+<p>To solve the possible recursion, we first add an entry in the symbol table as free type for the variable being defined and ignoring the checking of then and else statements. </p>
+<p>The code is as below:</p>
+<pre><code>@Override
+public Object visit(ASTLet node, Object data) {
+    // TODO Auto-generated method stub
+    int num = node.jjtGetNumChildren();
+    SimPLSymbol var = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
+    env.EnterBlock();
+    env.LocalSetSymbol((String)var.value, new SimPLSymbol(ValueType.FREE));
+    SimPLSymbol value = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+    if(value.type == ValueType.VAR)
+    {
+        if(!env.GlobalExist((String)value.value)){
+            return new SimPLSymbol(ValueType.EXCEPTION, &quot;var &quot;+value.value+&quot; is not defined&quot;);
+        }
+        env.LocalSetSymbol((String)var.value, env.GlobalGetSymbol((String)value.value));
+    }
+    else {
+        env.LocalSetSymbol((String)var.value, value);
+    }
+    SimPLSymbol body = (SimPLSymbol)node.jjtGetChild(2).jjtAccept(this, data);
+    if(body.type == ValueType.VAR)
+    {
+        if(!env.GlobalExist((String)body.value)){
+            return new SimPLSymbol(ValueType.EXCEPTION, &quot;var &quot;+body.value+&quot; is not defined&quot;);
+        }
+        body = env.GlobalGetSymbol((String)body.value);
+    }
+    env.LeaveBlock();
+    return body;
+}
+</code></pre>
+
+<h2>Test</h2>
+<p>We have tested our program with many test cases, including some unit tests like binop tests, and comprehensive tests like <strong><em>NQUEEN</em></strong>. We have tested our interpreter with <strong><em>NQUEEN</em></strong> using recursion as well as <strong><em>NQUEEN</em></strong> using loop. </p>
+<p>The result shows that our interpreter gives the expected answer.</p>
+<p>Here is a complex example showing the type inference:</p>
+<pre><code>Please input the expressions from standard input:
+let g = fun x -&gt; fun y-&gt; x+y in 
+    let f = fun x -&gt; fun y -&gt; head (x::((y+1)::nil))     in
+        g := f; ((f 1) 2) = ((g 1) 2) 
+    end
+end$
+**OUTPUT**
+true
+**END**
+</code></pre>
+
+<p>Next is an example showing the eq operation of different type(we iterate into any list or type to check each equality of element):</p>
+<pre><code>Please input the expressions from standard input:
+(1, 2::(3::nil)) = (1, 2::(3::nil))$
+**OUTPUT**
+true
+**END**
+</code></pre>
+
+<p>Another example for assignment checking(we check the function for return type and param type as well as the parameter number):</p>
+<pre><code>Reading from standard input...
+let g = fun x -&gt; fun y-&gt; x in 
+    let f = fun x -&gt; fun y -&gt; head (x::((y+1)::nil))     in
+        g := f; ((f 1) 2) = ((g 1) 2) 
+    end
+end$
+**OUTPUT**
+true
+**END**
+</code></pre>
+
+<h2>Discussion</h2>
+<h4>the fun makes the parse tree ambiguous.</h4>
+<p>Example:</p>
+<pre><code>A := fun x -&gt; x:=3; 3
+</code></pre>
+
+<p>A can be 3 or unit corresponding to 2 different parse tree.</p>
+<blockquote>
+<p>suggestion:</p>
+<p>Instead of 
+<em>fun x -&gt; e</em>, </p>
+<p>we can use 
+<em>fun x -&gt; e end</em></p>
+</blockquote>
+<h4>head/tail</h4>
+<blockquote>
+<p><strong>head nil</strong> returns <strong>nil</strong>. This seems very evil in type checking. Because head list should return a element type of list while head nil violate the rule.</p>
+<p>Suggestion:
+head nil should return an error  
+</p>
+</blockquote>
+<h2>Conclusion</h2>
+<p>We implement an interpreter which provides type inference as well as dynamic checking.
+We take the static scoping as the scoping strategy and solved many difficulties as mentioned above. We also write several test cases to validate the correctness of our program.</p>
+<p>And finally, thank Prof. Zhu and T.A. Zhao for your guidance in this course. Thank you very much. </p>
+
+</body>
+</html>
+<!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
