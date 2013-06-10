@@ -104,14 +104,14 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			String rightName = "";
 			if(left.value.equals("result")){
 				System.out.println("---stack---");
-				List<SimPLSymbol> tmp = (ArrayList<SimPLSymbol>)right.value;
+				/*List<SimPLSymbol> tmp = (ArrayList<SimPLSymbol>)right.value;
 				System.out.print(node.jjtGetFirstToken().beginLine + ":");
 				for(SimPLSymbol o : tmp){
 					System.out.print(o.value + " ");
 				}
 				System.out.print("\n");
 				System.out.println("n:" + env.GlobalGetSymbol("n").value);
-				System.out.println("i:" + env.GlobalGetSymbol("i").value);
+				System.out.println("i:" + env.GlobalGetSymbol("i").value);*/
 				System.out.println("-----------");
 			}
 			if(right.type == ValueType.VAR)
@@ -806,19 +806,23 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			}
 			if(value.type != ValueType.LIST)
 				return new SimPLSymbol(ValueType.EXCEPTION, "head/tail should be followed by a list");
-			List<SimPLSymbol> list = (List<SimPLSymbol>)value.value;
-			if(list == null) {
-				return value;
-			//	return new SimPLSymbol(ValueType.EXCEPTION, "head/tail on a nil");
-			}
-			if(op == "head"){
-				return list.get(0);
-			}else{
-				list.remove(0);
-				if(list.size()==0)
-					value.value = null;
-				return value;
-			}
+				try{
+				List<SimPLSymbol> list = (List<SimPLSymbol>)value.value;
+				if(list == null) {
+					return value;
+				//	return new SimPLSymbol(ValueType.EXCEPTION, "head/tail on a nil");
+				}
+				if(op == "head"){
+					return list.get(0);
+				}else{
+					list.remove(0);
+					if(list.size()==0)
+						value.value = null;
+					return value;
+				}
+				}catch(Exception e){
+					System.err.print(e.getMessage());
+				}
 		}
 		return new SimPLSymbol(ValueType.EXCEPTION,"not such unary op "+op);
 	}
@@ -1031,13 +1035,11 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		// TODO Auto-generated method stub
 		int num = node.jjtGetNumChildren();
 		
-		//System.out.println("in Application:"+num);
-		
 		SimPLSymbol param = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
 		if(param.type == ValueType.EXCEPTION)
 			return param;
 		String paramName = "";
-		String funname = "";
+		//String funname = "";
 		if(param.type == ValueType.VAR){
 			paramName = param.value.toString();
 			if(!env.GlobalExist((String)param.value)){
@@ -1054,11 +1056,9 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		if(func.type == ValueType.EXCEPTION)
 			return func;
 		
-		if(func.type == ValueType.EXCEPTION)
-			return new SimPLSymbol(ValueType.EXCEPTION,"error in first application");
 		if(func.type == ValueType.VAR){
-				funname = func.value.toString();
-				System.out.println("in app "+func.value.toString());
+				//funname = func.value.toString();
+				//System.out.println("in app "+func.value.toString());
 			
 			if(!env.GlobalExist((String)func.value)){
 				return new SimPLSymbol(ValueType.EXCEPTION, "var "+func.value+" is not defined");
@@ -1089,20 +1089,18 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				}
 				env.LeaveBlock();
 				int nests = env.PopStackToDepth(depth);
-				if(nests>0)
-					System.out.println("nests is "+nests);
-				System.out.println("app "+funname+" returns");
+				/*if(nests>0)
+					System.out.println("nests is "+nests);*/
+				//System.out.println("app "+funname+" returns");
 				return exp;
 			}else {
-				//env.LeaveBlock();
 				SimPLSymbol var = f.param;
-				//env.EnterBlock();
 				if(f.param.value.toString() == "q")
 				{
 					System.out.println("use q");
 				}
 				env.LocalSetSymbol(var.value.toString(), param);
-				System.out.println("app "+funname+" returns");
+				//System.out.println("app "+funname+" returns");
 				return f.body;
 			}
 			
