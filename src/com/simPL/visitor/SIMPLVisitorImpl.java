@@ -102,18 +102,18 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			if(left.type == ValueType.EXCEPTION)
 				return right;
 			String rightName = "";
-			if(left.value.equals("result")){
+			/*if(left.value.equals("result")){
 				System.out.println("---stack---");
-				/*List<SimPLSymbol> tmp = (ArrayList<SimPLSymbol>)right.value;
+				List<SimPLSymbol> tmp = (ArrayList<SimPLSymbol>)right.value;
 				System.out.print(node.jjtGetFirstToken().beginLine + ":");
 				for(SimPLSymbol o : tmp){
 					System.out.print(o.value + " ");
 				}
 				System.out.print("\n");
 				System.out.println("n:" + env.GlobalGetSymbol("n").value);
-				System.out.println("i:" + env.GlobalGetSymbol("i").value);*/
+				System.out.println("i:" + env.GlobalGetSymbol("i").value);
 				System.out.println("-----------");
-			}
+			}*/
 			if(right.type == ValueType.VAR)
 			{
 				rightName = right.value.toString();
@@ -129,91 +129,16 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				env.GlobalSetSymbol(rightName, left);
 				return new SimPLSymbol(ValueType.UNIT);
 			}
+			if(!SameType(left, right))
+				return new SimPLSymbol(ValueType.EXCEPTION, "assignment between 2 different types");
+			
 			env.GlobalSetSymbol(leftName, right);
 			return new SimPLSymbol(ValueType.UNIT);
 		}
 		
-		/*List<Token> list= new ArrayList<Token>();
-		Token cur = node.jjtGetFirstToken();
-		while(cur != ((SimpleNode)node.jjtGetChild(0)).jjtGetFirstToken()){
-			list.add(0,cur);
-			cur = cur.next;
-		}*/
-		
+	
 		SimPLSymbol n = left;
-		/*for(int i = 0; i < list.size();i++){
-			//SimPLSymbol n = new SimPLSymbol(left.type,left.value);
-			cur = list.get(i);
-			if(n.type == ValueType.VAR){
-				if(env.GlobalExist((String)n.value)){
-					n = env.GlobalGetSymbol((String)n.value);
-				}else
-					return new SimPLSymbol(ValueType.EXCEPTION,"not var "+n.value +" exists"); 
-			}
-			try{
-				if(cur.image == "head"){
-					if(n.type != ValueType.LIST){
-						return new SimPLSymbol(ValueType.EXCEPTION,"head argument is not a list");
-					}else{
-						if(n.value == null)//empty list
-							return new SimPLSymbol(ValueType.EXCEPTION,"head on nil");
-						else {
-							n = ((ArrayList<SimPLSymbol>)(n.value)).get(0);
-							cur = cur.next;
-							continue;
-						}
-					}
-				}else if(cur.image == "tail"){
-					if(n.type != ValueType.LIST){
-						return new SimPLSymbol(ValueType.EXCEPTION,"tail argument is not a list");
-					}else{
-						if(n.value == null)//empty list
-							return new SimPLSymbol(ValueType.EXCEPTION,"tail on nil");
-						else{
-							SimPLSymbol result = n;
-							if(((ArrayList<SimPLSymbol>)result.value).size()==1){
-								n.value=null;
-								continue;
-							}else if(((ArrayList<SimPLSymbol>)result.value).size()==0){
-								return new SimPLSymbol(ValueType.EXCEPTION,"tail on nil");
-							}
-							
-							((ArrayList<SimPLSymbol>)result.value).remove(0);
-							n = result;
-							cur = cur.next;
-							
-							continue;
-						}
-					}
-				}else if(cur.image == "fst"){
-					if(n.type != ValueType.PAIR){
-						return new SimPLSymbol(ValueType.EXCEPTION,"fst argument is not a pair");
-					}else{
-						
-							MyPair p  = (MyPair)(n.value);
-							n = (SimPLSymbol)p.first;
-							cur = cur.next;
-							continue;
-					}
-				}else if(cur.image == "snd"){
-					if(n.type != ValueType.PAIR){
-						return new SimPLSymbol(ValueType.EXCEPTION,"snd argument is not a pair");
-					}else{
-						
-							MyPair p  = (MyPair)(n.value);
-							n = (SimPLSymbol)p.second;
-							cur = cur.next;
-							continue;
-					}
-				}else {
-					return new SimPLSymbol(ValueType.EXCEPTION,"error in fst,head,tail,snd");
-					
-				}
-			}catch (Exception e){
-				return new SimPLSymbol(ValueType.EXCEPTION,"error in fst,head,tail,snd");
-			}
-			//cur = cur.next;
-		}*/
+		
 		
 		return n;
 	}
@@ -437,6 +362,54 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		}
 		return true;
 	}
+	
+	private boolean SameType(SimPLSymbol left, SimPLSymbol right){
+		if(left.type == ValueType.VAR)
+		{
+			if(!env.GlobalExist(left.value.toString())){
+				return false;
+			}else {
+				left =env.GlobalGetSymbol(left.value.toString());
+			}
+		}
+		if(left.type == ValueType.FREE){
+			return true;
+		}
+		if(right.type == ValueType.VAR)
+		{
+			if(!env.GlobalExist(right.value.toString())){
+				return false;
+			}else {
+				right =env.GlobalGetSymbol(right.value.toString());
+			}
+		}
+		if(right.type == ValueType.FREE){
+			return true;
+		}
+		if(left.type != right.type)
+			return false;
+		if(left.type == ValueType.LIST){
+			return SameListLevel(left,right);
+		}
+		if(left.type == ValueType.UNIT)
+			return true;
+		if(left.type == ValueType.PAIR)
+			return SameType(((MyPair)left.value).first,((MyPair)right.value).first) 
+					&& SameType(((MyPair)left.value).second,((MyPair)right.value).second);
+		if(left.type == ValueType.FUN){
+			MyFunc leftFunc = (MyFunc)left.value;
+			MyFunc rightFunc = (MyFunc)right.value;
+			if(leftFunc.level != rightFunc.level)
+				return false;
+			if(leftFunc.level == 0)
+				return leftFunc.returnType == rightFunc.returnType && leftFunc.paramType == rightFunc.paramType;
+			else{
+				return Equal(leftFunc.body,rightFunc.body);
+			}
+		}
+		return true;
+	}
+	
 	private boolean Equal(SimPLSymbol left, SimPLSymbol right){
 		if(left.type == ValueType.VAR)
 		{
@@ -1075,8 +1048,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				param = new SimPLSymbol(f.paramType);
 				env.GlobalSetSymbol(paramName, param);
 			}
-			if(param.type != f.paramType)
-				return new SimPLSymbol(ValueType.EXCEPTION, "type not match in function " + funname);
+			if(param.type != f.paramType && f.paramType != ValueType.FREE)
+				return new SimPLSymbol(ValueType.EXCEPTION, "parameter type does not match for function " + funname);
 			if(f.level == 0) {
 				SimPLSymbol var = f.param;
 				
