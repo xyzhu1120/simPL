@@ -58,6 +58,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		//return node.childrenAccept(this, data);
 		env.EnterBlock();
 		SimPLSymbol result = (SimPLSymbol) node.jjtGetChild(0).jjtAccept(this, data);
+		if(((SimPLSymbol)result).type == ValueType.EXCEPTION)
+			return result;
 		env.LeaveBlock();
 		if(result.type == ValueType.VAR){
 			if(env.GlobalExist((String)result.value)){
@@ -79,7 +81,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		int num = node.jjtGetNumChildren();
 		//System.out.println("in Assignment:"+num);
 		SimPLSymbol left = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
-		
+		if(left.type == ValueType.EXCEPTION)
+			return left;
 		if(num > 1){
 /*			if(node.jjtGetFirstToken().image == "head" || node.jjtGetFirstToken().image == "tail" || node.jjtGetFirstToken().image == "fst" || node.jjtGetFirstToken().image == "snd"){
 				return new SimPLSymbol(ValueType.EXCEPTION,"cannot operate on a unit");
@@ -95,6 +98,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			ValueType leftType = env.GlobalGetSymbol(leftName).type;
 			
 			SimPLSymbol right = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+			if(left.type == ValueType.EXCEPTION)
+				return right;
 			String rightName = "";
 			if(left.value.equals("result")){
 				System.out.println("---stack---");
@@ -221,7 +226,9 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		int num = node.jjtGetNumChildren();
 		//System.out.println("in ADDMINUS:"+num);
 		
-		Object first = node.jjtGetChild(0).jjtAccept(this, data);
+		SimPLSymbol first = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
+		if(first.type == ValueType.EXCEPTION)
+			return first;
 		if(num > 1){
 			try {
 				String leftName="";
@@ -237,6 +244,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				SimPLSymbol right = null;
 				for(int i = 1; i < num; i++){
 					right = (SimPLSymbol)node.jjtGetChild(i).jjtAccept(this, data);
+					if(right.type == ValueType.EXCEPTION)
+						return right;
 					if(right.type == ValueType.VAR){
 						if(env.GlobalExist((String)right.value)){
 							right = env.GlobalGetSymbol((String)right.value);
@@ -343,6 +352,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		//System.out.println("in AndOr:"+num);
 		
 		Object first = node.jjtGetChild(0).jjtAccept(this, data);
+		if(((SimPLSymbol)first).type == ValueType.EXCEPTION)
+			return first;
 		try {
 			if(num > 1){
 				boolean sum = true;
@@ -385,6 +396,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 					else if(last.jjtGetLastToken().next.image == "or")
 						sign = false;
 					cur = node.jjtGetChild(i+1).jjtAccept(this, data);
+					if(((SimPLSymbol)cur).type == ValueType.EXCEPTION)
+						return cur;
 				}
 				SimPLSymbol result = new SimPLSymbol(ValueType.BOOLEAN);
 				result.value = sum?"true":"false";
@@ -487,6 +500,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		//System.out.println("in Compare:"+num);
 		
 		Object first = node.jjtGetChild(0).jjtAccept(this, data);
+		if(((SimPLSymbol)first).type == ValueType.EXCEPTION)
+			return first;
 		try {
 			if(num > 1){
 				String op = ((SimpleNode)(node.jjtGetChild(0))).jjtGetLastToken().next.image;
@@ -507,6 +522,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				
 				
 				SimPLSymbol right = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+				if(right.type == ValueType.EXCEPTION)
+					return right;
 				String rightName="";
 				if(right.type == ValueType.VAR)
 				 {
@@ -579,6 +596,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		//System.out.println("in ADDMINUS:"+num);
 		
 		Object first = node.jjtGetChild(0).jjtAccept(this, data);
+		if(((SimPLSymbol)first).type == ValueType.EXCEPTION)
+			return first;
 		try {
 			if(num > 1){
 				int sum = 0;
@@ -618,6 +637,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 					else
 						sign = -1;
 					cur = node.jjtGetChild(i+1).jjtAccept(this, data);
+					if(((SimPLSymbol)cur).type == ValueType.EXCEPTION)
+						return cur;
 				}
 				SimPLSymbol result = new SimPLSymbol(ValueType.INTEGER);
 				result.value = Integer.toString(sum);
@@ -640,6 +661,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		//System.out.println("in MulDiv:"+num);
 		
 		Object first = node.jjtGetChild(0).jjtAccept(this, data);
+		if(((SimPLSymbol)first).type == ValueType.EXCEPTION)
+			return first;
 		try {
 			if(num > 1){
 				int sum = 1;
@@ -684,6 +707,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 					else if(last.jjtGetLastToken().next.image == "/")
 						sign = false;
 					cur = node.jjtGetChild(i+1).jjtAccept(this, data);
+					if(((SimPLSymbol)cur).type == ValueType.EXCEPTION)
+						return cur;
 				}
 				SimPLSymbol result = new SimPLSymbol(ValueType.INTEGER);
 				result.value = Integer.toString(sum);
@@ -806,7 +831,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		//System.out.println("in Let:"+num);
 		
 		SimPLSymbol var = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
-		
+		if(var.type == ValueType.EXCEPTION)
+			return var;
 		
 		
 //		if(env.LocalExist((String)var.value)){
@@ -816,6 +842,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		env.EnterBlock();
 		env.LocalSetSymbol((String)var.value, new SimPLSymbol(ValueType.FREE));
 		SimPLSymbol value = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+		if(((SimPLSymbol)value).type == ValueType.EXCEPTION)
+			return value;
 		if(value.type == ValueType.VAR)
 		{
 			if(!env.GlobalExist((String)value.value)){
@@ -827,6 +855,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			env.LocalSetSymbol((String)var.value, value);
 		}
 		SimPLSymbol body = (SimPLSymbol)node.jjtGetChild(2).jjtAccept(this, data);
+		if(body.type == ValueType.EXCEPTION)
+			return body;
 		if(body.type == ValueType.VAR)
 		{
 			if(!env.GlobalExist((String)body.value)){
@@ -845,6 +875,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 	public Object visit(ASTCond node, Object data) {
 		// TODO Auto-generated method stub
 		SimPLSymbol cond = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
+		if(((SimPLSymbol)cond).type == ValueType.EXCEPTION)
+			return cond;
 		String var = "";
 		if(cond.type == ValueType.EXCEPTION){
 			return cond;
@@ -915,7 +947,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				
 		while(true){
 			SimPLSymbol cond = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
-			
+			if(((SimPLSymbol)cond).type == ValueType.EXCEPTION)
+				return cond;
 			String var = "";
 			if(cond.type == ValueType.VAR)
 			{
@@ -964,6 +997,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		int num = node.jjtGetNumChildren();
 		
 		SimPLSymbol first = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
+		if(first.type == ValueType.EXCEPTION)
+			return first;
 		if(first.type == ValueType.VAR)
 		{
 			if(!env.GlobalExist((String)first.value)){
@@ -972,6 +1007,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			first = env.GlobalGetSymbol((String)first.value);
 		}
 		SimPLSymbol second = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+		if(second.type == ValueType.EXCEPTION)
+			return second;
 		if(second.type == ValueType.VAR)
 		{
 			if(!env.GlobalExist((String)second.value)){
@@ -995,6 +1032,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		//System.out.println("in Application:"+num);
 		
 		SimPLSymbol param = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+		if(param.type == ValueType.EXCEPTION)
+			return param;
 		String paramName = "";
 		if(param.type == ValueType.VAR){
 			paramName = param.value.toString();
@@ -1005,6 +1044,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		}
 		int depth = env.GetDepth();
 		SimPLSymbol func = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
+		if(func.type == ValueType.EXCEPTION)
+			return func;
 		if(depth != env.GetDepth())
 		{
 			System.out.println("nests should be "+depth);
@@ -1031,7 +1072,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				env.EnterBlock();
 				env.LocalSetSymbol(var.value.toString(), param);
 				SimPLSymbol exp = (SimPLSymbol)f.node.jjtAccept(this, data);
-				
+				if(((SimPLSymbol)exp).type == ValueType.EXCEPTION)
+					return exp;
 				if(exp.type == ValueType.VAR){
 					exp = env.GlobalGetSymbol(exp.value.toString());
 				}
@@ -1065,6 +1107,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		ValueType paramType = ValueType.FREE;
 		ValueType returnType = ValueType.FREE;
 		SimPLSymbol param = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
+		if(((SimPLSymbol)param).type == ValueType.EXCEPTION)
+			return param;
 		env.EnterBlock();
 		env.LocalSetSymbol(param.value.toString(), new SimPLSymbol(ValueType.FREE));
 		boolean backedup = false;
@@ -1073,6 +1117,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			envbak = env.Duplicate();
 		}
 		SimPLSymbol body = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
+		if(((SimPLSymbol)body).type == ValueType.EXCEPTION)
+			return body;
 		paramType = env.GlobalGetSymbol(param.value.toString()).type;
 		
 		if(body.type == ValueType.VAR)
@@ -1143,6 +1189,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		Object result = null;
 		for(int i = 0; i < num;i++){
 			result = node.jjtGetChild(i).jjtAccept(this, data);
+			if(((SimPLSymbol)result).type == ValueType.EXCEPTION)
+				return result;
 			if(i!=num-1)
 				if(((SimPLSymbol)result).type!=ValueType.UNIT){
 					return new SimPLSymbol(ValueType.EXCEPTION, "in-final sequence expression should be unit");
