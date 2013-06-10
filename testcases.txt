@@ -206,10 +206,46 @@ in
 				queens = fun n ->(((traceback n)n )nil)
 			in
 				(queens 8)
-			end
+				
+
+((fun x -> fun y -> x+y 2)3)$
+
+let 
+	mod = 
+		fun x -> 
+			fun y -> x - x / y * y 
+			end 
 		end
+in 
+	let 
+		gcd = 
+			fun x -> 
+				fun y -> 
+					if (( mod x ) y) = 0 
+						then y 
+						else ((gcd y)((mod x) y)) 
+					end 
+				end 
+			end
+	in ((gcd 85) 43)
 	end
-end$
+end
+$
 
-
-
+let
+			traceback= fun n-> fun max-> fun result->
+				let
+					i = 1
+				in
+					if n > 0 then
+						
+						result
+					else 
+						result
+					end
+				end
+		in
+			
+				(((traceback 2)2 )2)
+			
+		end$
