@@ -1039,7 +1039,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		if(param.type == ValueType.EXCEPTION)
 			return param;
 		String paramName = "";
-		//String funname = "";
+		String funname = "";
 		if(param.type == ValueType.VAR){
 			paramName = param.value.toString();
 			if(!env.GlobalExist((String)param.value)){
@@ -1057,7 +1057,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			return func;
 		
 		if(func.type == ValueType.VAR){
-				//funname = func.value.toString();
+			funname = func.value.toString();
 				//System.out.println("in app "+func.value.toString());
 			
 			if(!env.GlobalExist((String)func.value)){
@@ -1075,6 +1075,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				param = new SimPLSymbol(f.paramType);
 				env.GlobalSetSymbol(paramName, param);
 			}
+			if(param.type != f.paramType)
+				return new SimPLSymbol(ValueType.EXCEPTION, "type not match in function " + funname);
 			if(f.level == 0) {
 				SimPLSymbol var = f.param;
 				
@@ -1095,10 +1097,6 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				return exp;
 			}else {
 				SimPLSymbol var = f.param;
-				if(f.param.value.toString() == "q")
-				{
-					System.out.println("use q");
-				}
 				env.LocalSetSymbol(var.value.toString(), param);
 				//System.out.println("app "+funname+" returns");
 				return f.body;
