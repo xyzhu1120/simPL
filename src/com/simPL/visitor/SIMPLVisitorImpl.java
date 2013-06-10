@@ -32,6 +32,7 @@ import com.simPL.compiler.Token;
 
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  *
  */
@@ -1042,8 +1043,11 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			}else
 				param = env.GlobalGetSymbol(param.value.toString());
 		}
+		env.EnterBlock();
 		int depth = env.GetDepth();
+		
 		SimPLSymbol func = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
+		
 		if(func.type == ValueType.EXCEPTION)
 			return func;
 		if(depth != env.GetDepth())
@@ -1069,11 +1073,13 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			}
 			if(f.level == 0) {
 				SimPLSymbol var = f.param;
-				env.EnterBlock();
+				
 				env.LocalSetSymbol(var.value.toString(), param);
 				SimPLSymbol exp = (SimPLSymbol)f.node.jjtAccept(this, data);
-				if(((SimPLSymbol)exp).type == ValueType.EXCEPTION)
+				if(((SimPLSymbol)exp).type == ValueType.EXCEPTION){
+					env.LeaveBlock();
 					return exp;
+				}
 				if(exp.type == ValueType.VAR){
 					exp = env.GlobalGetSymbol(exp.value.toString());
 				}
@@ -1083,7 +1089,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 					System.out.println("nests is "+nests);
 				return exp;
 			}else {
-				
+				env.LeaveBlock();
 				SimPLSymbol var = f.param;
 				//env.EnterBlock();
 				env.LocalSetSymbol(var.value.toString(), param);
