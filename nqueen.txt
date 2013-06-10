@@ -66,7 +66,7 @@ in
 			let
 				queens = fun n ->(((traceback n)n )nil)
 			in
-				(queens 4)
+				(queens 8)
 			end
 		end
 	end

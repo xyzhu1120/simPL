@@ -83,29 +83,29 @@ public class SimPLSymbol {
 				if ( i < list.size() - 1 )
 					System.out.print(", ");
 			}
-			System.out.print("]\n");
+			System.out.print("]");
 		}
 		if(type == ValueType.UNIT)
 			System.out.println("unit");
 		if(type == ValueType.PAIR){
-			System.out.println("Pair:");
-			System.out.println("(");
+			//System.out.print("Pair:");
+			System.out.print("(");
 			SimPLSymbol first = ((MyPair)value).first;
 			
 			SimPLSymbol second = ((MyPair)value).second;
 			first.Print();
-			System.out.println(",");
+			System.out.print(",");
 			second.Print();
-			System.out.println(")");
+			System.out.print(")");
 		}
 		if(type == ValueType.VAR)
-			System.out.println(value.toString());
+			System.out.print(value.toString());
 		if(type == ValueType.FUN)
-			System.out.println("Fun");
+			System.out.print("Fun");
 		if(type == ValueType.EXCEPTION)
-			System.out.println(value.toString());
+			System.out.print(value.toString());
 		if(type == ValueType.UNDEF)
-			System.out.println("undefine");
+			System.out.print("undefine");
 	}
 	
 	public SimPLSymbol(ValueType theType){

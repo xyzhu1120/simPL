@@ -52,7 +52,8 @@ public class SimPL {
 				new SIMPL(new InputStreamReader(new FileInputStream(file)));
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block	
-				e.printStackTrace();
+				System.out.println("IO ERROR: failed to read the file. Please make sure the file exists!");
+				return;
 			}
 		}else{
 			System.out.println("Reading from standard input...");
@@ -68,7 +69,7 @@ public class SimPL {
 		      //if(r.type == ValueType.INTEGER)
 		      System.out.println("\n\n**OUTPUT**");
 		      r.Print();
-		      System.out.println("**END**\n\n");
+		      System.out.println("\n**END**\n\n");
 		      
 		      if(verbose)
 		    	  n.dump("--");
