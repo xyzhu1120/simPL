@@ -512,6 +512,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				 {
 					leftName = left.value.toString();
 						String var = (String)left.value;
+						//env.PrintStack();
 						if(!env.GlobalExist(var)){
 							return new SimPLSymbol(ValueType.EXCEPTION,"no such symbol "+var);
 						}else {
@@ -1036,6 +1037,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		if(param.type == ValueType.EXCEPTION)
 			return param;
 		String paramName = "";
+		String funname = "";
 		if(param.type == ValueType.VAR){
 			paramName = param.value.toString();
 			if(!env.GlobalExist((String)param.value)){
@@ -1043,26 +1045,28 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			}else
 				param = env.GlobalGetSymbol(param.value.toString());
 		}
-		env.EnterBlock();
-		int depth = env.GetDepth();
 		
+		
+		int depth = env.GetDepth();
+		env.EnterBlock();
 		SimPLSymbol func = (SimPLSymbol)node.jjtGetChild(0).jjtAccept(this, data);
 		
 		if(func.type == ValueType.EXCEPTION)
 			return func;
-		if(depth != env.GetDepth())
-		{
-			System.out.println("nests should be "+depth);
-		}
+		
 		if(func.type == ValueType.EXCEPTION)
 			return new SimPLSymbol(ValueType.EXCEPTION,"error in first application");
 		if(func.type == ValueType.VAR){
+				funname = func.value.toString();
+				System.out.println("in app "+func.value.toString());
+			
 			if(!env.GlobalExist((String)func.value)){
 				return new SimPLSymbol(ValueType.EXCEPTION, "var "+func.value+" is not defined");
 			}else
 				func = env.GlobalGetSymbol(func.value.toString());
 		}
 		if(func.type == ValueType.FREE){
+			env.LeaveBlock();
 			return new SimPLSymbol(ValueType.FREE);
 		}
 		if (func.type == ValueType.FUN) {
@@ -1087,12 +1091,18 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				int nests = env.PopStackToDepth(depth);
 				if(nests>0)
 					System.out.println("nests is "+nests);
+				System.out.println("app "+funname+" returns");
 				return exp;
 			}else {
-				env.LeaveBlock();
+				//env.LeaveBlock();
 				SimPLSymbol var = f.param;
 				//env.EnterBlock();
+				if(f.param.value.toString() == "q")
+				{
+					System.out.println("use q");
+				}
 				env.LocalSetSymbol(var.value.toString(), param);
+				System.out.println("app "+funname+" returns");
 				return f.body;
 			}
 			
