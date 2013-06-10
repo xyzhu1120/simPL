@@ -130,7 +130,8 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 				return new SimPLSymbol(ValueType.UNIT);
 			}
 			if(!SameType(left, right))
-				return new SimPLSymbol(ValueType.EXCEPTION, "assignment between 2 different types");
+				System.out.println("assignment between 2 different types");
+			//	return new SimPLSymbol(ValueType.EXCEPTION, "assignment between 2 different types");
 			
 			env.GlobalSetSymbol(leftName, right);
 			return new SimPLSymbol(ValueType.UNIT);
@@ -220,7 +221,7 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 									list.add(0,left);
 									//right.value=list;
 								}else{
-									return new SimPLSymbol(ValueType.EXCEPTION,"list level not matched");
+									return new SimPLSymbol(ValueType.EXCEPTION,"list cannot have different types of elements");
 								}
 							}catch (Exception e){
 								return new SimPLSymbol(ValueType.EXCEPTION,"exception in list");
@@ -391,8 +392,6 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 		if(left.type == ValueType.LIST){
 			return SameListLevel(left,right);
 		}
-		if(left.type == ValueType.UNIT)
-			return true;
 		if(left.type == ValueType.PAIR)
 			return SameType(((MyPair)left.value).first,((MyPair)right.value).first) 
 					&& SameType(((MyPair)left.value).second,((MyPair)right.value).second);
