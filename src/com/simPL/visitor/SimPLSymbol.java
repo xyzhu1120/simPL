@@ -66,19 +66,24 @@ public class SimPLSymbol {
 		return true;
 	}
 	public void Print(){
+		//System.out.println("**PROGRAM OUTPUT**:");
 		if(type == ValueType.INTEGER)
-			System.out.println(value.toString());
+			System.out.print(value.toString());
 		if(type == ValueType.BOOLEAN)
-			System.out.println(value.toString());
+			System.out.print(value.toString());
 		if(type == ValueType.LIST) {
-			System.out.println("list");
 			if(value == null) {
-				System.out.println("the list is nil");
+				System.out.println("nil list");
 				return;
 			}
 			List<SimPLSymbol> list = (List<SimPLSymbol>)value;
-			for(int i =0; i < list.size();i++)
+			System.out.print('[');
+			for(int i =0; i < list.size();i++){
 				list.get(i).Print();
+				if ( i < list.size() - 1 )
+					System.out.print(", ");
+			}
+			System.out.print("]\n");
 		}
 		if(type == ValueType.UNIT)
 			System.out.println("unit");

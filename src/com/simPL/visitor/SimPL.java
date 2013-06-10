@@ -34,25 +34,30 @@ public class SimPL {
 		}
 	    System.out.println("\n"+banner);
 		boolean filemode = false;
+		boolean verbose = false;
 		String filename = "";
 		if(args.length == 2){
-			if(args[0].equalsIgnoreCase("-f")){
+			if(args[0].contains("f")){
 				filemode = true;
 				filename = args[1];
+			}
+			if (args[0].contains("v")){
+				verbose = true;
 			}
 		}
 		if(filemode){
 			File file = new File(filename);
 			try {
+				System.out.println("Reading from file: " + filename);
 				new SIMPL(new InputStreamReader(new FileInputStream(file)));
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block	
 				e.printStackTrace();
 			}
 		}else{
-			 new SIMPL(System.in);
+			System.out.println("Reading from standard input...");
+			new SIMPL(System.in);
 		}
-	    System.out.println("Reading from standard input...");
 	   
 	    while(true){
 		    try
@@ -61,14 +66,19 @@ public class SimPL {
 		      Object result = n.jjtAccept(new SIMPLVisitorImpl(), null);
 		      SimPLSymbol r = (SimPLSymbol)result;
 		      //if(r.type == ValueType.INTEGER)
-		     r.Print();
+		      System.out.println("\n\n**OUTPUT**");
+		      r.Print();
+		      System.out.println("**END**\n\n");
+		      
+		      if(verbose)
+		    	  n.dump("--");
 		      //if(r.type == ValueType.EXCEPTION)
 			  //  	 System.out.println((String)r.value);
 		      //n.dump("");
 		    }
 		    catch (Exception e)
 		    {
-		      System.out.println("Oops.");
+		      System.out.println("ERROR:");
 		      System.out.println(e.getMessage());
 		    }
 		    catch (Error e)
@@ -76,7 +86,7 @@ public class SimPL {
 			      System.out.println("Oops.");
 			      System.out.println(e.getMessage());
 		    }
-		    System.out.println("Please input the expressions:");
+		    System.out.println("Please input the expressions from standard input:");
 		    SIMPL.ReInit(System.in);
 	    }
 	}
