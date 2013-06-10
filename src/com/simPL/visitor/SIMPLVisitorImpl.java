@@ -96,6 +96,18 @@ public class SIMPLVisitorImpl implements SIMPLVisitor, SIMPLConstants {
 			
 			SimPLSymbol right = (SimPLSymbol)node.jjtGetChild(1).jjtAccept(this, data);
 			String rightName = "";
+			if(left.value.equals("result")){
+				System.out.println("---stack---");
+				List<SimPLSymbol> tmp = (ArrayList<SimPLSymbol>)right.value;
+				System.out.print(node.jjtGetFirstToken().beginLine + ":");
+				for(SimPLSymbol o : tmp){
+					System.out.print(o.value + " ");
+				}
+				System.out.print("\n");
+				System.out.println("n:" + env.GlobalGetSymbol("n").value);
+				System.out.println("i:" + env.GlobalGetSymbol("i").value);
+				System.out.println("-----------");
+			}
 			if(right.type == ValueType.VAR)
 			{
 				rightName = right.value.toString();

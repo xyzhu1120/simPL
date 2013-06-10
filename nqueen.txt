@@ -1,0 +1,73 @@
+let 
+	arrsize = fun arr->
+		let
+			size = 0
+		in
+			while not (arr = nil) do
+				size := size + 1;
+				arr := tail arr
+			end;
+			size
+		end
+in
+	let
+		safe=fun q-> fun cur-> fun result->
+			let
+				flag = true
+			in
+				let
+					size = (arrsize result)
+				in
+					if size > 0 then
+						let
+							first = head result
+						in
+							if q = first then
+								flag := false
+							else() 
+							end;
+							if (q - first) = cur or (first - q) = cur then
+								flag := false
+							else()
+							end;
+							flag := flag and (((safe q) (cur + 1) ) (tail result) )
+						end
+					else () end;
+					flag
+				end
+			end
+	in
+		let
+			traceback= fun n-> fun max-> fun result->
+				let
+					i = 1
+				in
+					if n > 0 then
+						while i < (max + 1)  do
+							if (((safe i) 1) result) then
+								result := i :: result;
+								n := n - 1;
+								result := (((traceback (n)) max) result);
+								n := n + 1;
+								if ( arrsize result ) = max then
+									i := max + 2
+								else 
+									result := tail result 
+								end
+							else () end;
+							i := i+1
+						end;
+						result
+					else 
+						result
+					end
+				end
+		in
+			let
+				queens = fun n ->(((traceback n)n )nil)
+			in
+				(queens 4)
+			end
+		end
+	end
+end$

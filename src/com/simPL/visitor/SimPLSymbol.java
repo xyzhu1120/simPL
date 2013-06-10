@@ -104,8 +104,8 @@ public class SimPLSymbol {
 	}
 	
 	public SimPLSymbol(ValueType theType){
-		if(theType == ValueType.EXCEPTION)
-			System.err.println("exception happens");
+		//if(theType == ValueType.EXCEPTION)
+			//System.err.println("exception happens");
 		type = theType;
 		if(type==ValueType.BOOLEAN)
 			value = "true";
@@ -140,8 +140,8 @@ public class SimPLSymbol {
 		return result;
 	}
 	public SimPLSymbol(ValueType theType, Object theValue){
-		if(theType == ValueType.EXCEPTION)
-			System.err.println((String)theValue);
+		//if(theType == ValueType.EXCEPTION)
+		//	System.err.println((String)theValue);
 		type = theType;
 		value = theValue;
 	}
