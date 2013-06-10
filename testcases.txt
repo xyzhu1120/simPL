@@ -234,16 +234,7 @@ $
 
 let
 			traceback= fun n-> fun max-> fun result->
-				let
-					i = 1
-				in
-					if n > 0 then
-						
-						result
-					else 
-						result
-					end
-				end
+				n+1
 		in
 			
 				(((traceback 2)2 )2)
