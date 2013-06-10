@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
@@ -13,7 +14,7 @@ import com.simPL.compiler.SIMPL;
 import com.simPL.compiler.SimpleNode;
 
 public class SimPL {
-
+	
 	/**
 	 * @param args
 	 */
@@ -21,7 +22,8 @@ public class SimPL {
 		// TODO Auto-generated method stub
 		String banner = "";
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader("banner"));
+			Resource r = new Resource();
+			BufferedReader reader = r.getResource();
 			String tmpstring = "";
 			while((tmpstring = reader.readLine()) != null)
 				banner = banner + tmpstring + '\n';
@@ -31,6 +33,8 @@ public class SimPL {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (Exception e){
+			System.out.println("Failed to Load our logo -_-||");
 		}
 	    System.out.println("\n"+banner);
 		boolean filemode = false;
@@ -93,5 +97,6 @@ public class SimPL {
 		    SIMPL.ReInit(System.in);
 	    }
 	}
-
+	
 }
+
